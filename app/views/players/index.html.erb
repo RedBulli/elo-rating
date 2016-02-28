@@ -1,22 +1,23 @@
 <ol>
-<% @players.each do |player| %>
-  <li><%=player.elo.name%></li>
-<%end %>
+  <% @players.each do |player| %>
+    <li><%=player.elo.name%></li>
+  <%end %>
 </ol>
 
 <%= form_tag(url_for(action: 'create', controller: 'frames'), method: "POST") do %>
   <span>New result:</span>
-  <ul>
-    <% [1,2].each do |i| %>
-    <li>
-      <input type="text" name="player_<%= i %>" list="player-suggestions">
-      <input type="radio" id="breaker_<%= i %>" name="breaker" value="<%= i %>">
-      <label for="breaker_<%= i %>">Breaker</label>
-      <input type="radio" id="winner_<%= i %>" name="winner" value="<%= i %>">
-      <label for="winner_<%= i %>">Winner</label>
-    </li>
-    <% end %>
-  </ul>
+  <fieldset>
+    <label for="winner">Winner</label>
+    <input type="text" name="winner" list="player-suggestions">
+    <input type="radio" id="breaker" name="breaker" value="winner">
+    <label for="breaker">Breaker</label>
+  </fieldset>
+  <fieldset>
+    <label for="loser">Loser</label>
+    <input type="text" name="loser" list="player-suggestions">
+    <input type="radio" id="breaker" name="breaker" value="loser">
+    <label for="breaker">Breaker</label>
+  </fieldset>
   <input type="submit">
 <% end %>
 

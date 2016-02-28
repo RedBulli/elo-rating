@@ -2,8 +2,8 @@ class FramesController < ApplicationController
   def create
     permitted_params
     Frame.create!(
-      player1_elo: player_elos[0],
-      player2_elo: player_elos[1],
+      player1_elo: player1_elo,
+      player2_elo: player2_elo,
       winner: winner
     )
     redirect_to root_url
@@ -12,31 +12,30 @@ class FramesController < ApplicationController
   private
 
   def permitted_params
-    params.require(:player_1)
-    params.require(:player_2)
     params.require(:winner)
+    params.require(:loser)
     params.require(:breaker)
-    params.permit(:player_1, :player_2, :winner, :breaker)
+    params.permit(:winner, :loser, :breaker)
   end
 
-  def player_elos
-    @player_elos ||= player_params.map { |player_param| get_or_create_player_elo(player_param) }
+  def player1_elo
+    if permitted_params[:breaker] == 'winner'
+      get_or_create_player_elo(permitted_params[:winner])
+    else
+      get_or_create_player_elo(permitted_params[:loser])
+    end
+  end
+
+  def player2_elo
+    if permitted_params[:breaker] == 'winner'
+      get_or_create_player_elo(permitted_params[:loser])
+    else
+      get_or_create_player_elo(permitted_params[:winner])
+    end
   end
 
   def winner
-    if permitted_params[:winner].to_i == 1
-      get_or_create_player(permitted_params[:player_1])
-    else
-      get_or_create_player(permitted_params[:player_2])
-    end
-  end
-
-  def player_params
-    if permitted_params[:breaker].to_i == 1
-      [permitted_params[:player_1], permitted_params[:player_2]]
-    else
-      [permitted_params[:player_2], permitted_params[:player_1]]
-    end
+    get_or_create_player(permitted_params[:winner])
   end
 
   def get_or_create_player_elo(name)
