@@ -1,0 +1,21 @@
+<ol>
+<% @players.each do |player| %>
+  <li><%=player.elo.name%></li>
+<%end %>
+</ol>
+
+<%= form_for :frame do |f| %>
+  <span>New result:</span>
+  <ul>
+    <% [1,2].each do |i| %>
+    <li>
+      <input type="text" name="player_<%= i %>">
+      <input type="radio" id="breaker_<%= i %>" name="breaker" value="<%= i %>">
+      <label for="breaker_<%= i %>">Breaker</label>
+      <input type="radio" id="winner_<%= i %>" name="winner" value="<%= i %>">
+      <label for="winner_<%= i %>">Winner</label>
+    </li>
+    <% end %>
+  </ul>
+  <input type="submit">
+<% end %>
