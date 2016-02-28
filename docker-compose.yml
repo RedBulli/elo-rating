@@ -1,0 +1,31 @@
+postgres:
+  image: postgres
+  ports:
+    - "5432"
+  environment:
+    POSTGRES_DB: 'elo_rating_development'
+    POSTGRES_USER: 'elo_rating'
+
+web:
+  build: .
+  command: bundle exec foreman start
+  volumes:
+    - .:/app
+  links:
+    - postgres
+  ports:
+    - "5000:5000"
+  environment:
+    DATABASE_URL: 'postgresql://postgres@postgres/elo_rating_development'
+
+test:
+  build: .
+  command: bundle exec rake spec
+  volumes:
+    - .:/app
+  ports:
+    - "7000:7000"
+  links:
+    - postgres
+  environment:
+    DATABASE_URL: 'postgresql://postgres@postgres/elo_rating_test'
