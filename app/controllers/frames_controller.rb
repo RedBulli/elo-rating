@@ -1,5 +1,6 @@
 class FramesController < ApplicationController
   def create
+    permitted_params
     Frame.create!(
       player1_elo: player_elos[0],
       player2_elo: player_elos[1],

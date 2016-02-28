@@ -9,7 +9,7 @@
   <ul>
     <% [1,2].each do |i| %>
     <li>
-      <input type="text" name="player_<%= i %>">
+      <input type="text" name="player_<%= i %>" list="player-suggestions">
       <input type="radio" id="breaker_<%= i %>" name="breaker" value="<%= i %>">
       <label for="breaker_<%= i %>">Breaker</label>
       <input type="radio" id="winner_<%= i %>" name="winner" value="<%= i %>">
@@ -19,3 +19,9 @@
   </ul>
   <input type="submit">
 <% end %>
+
+<datalist id="player-suggestions">
+  <% @players.each do |player| %>
+    <option value="<%=player.name%>">
+  <%end %>
+</datalist>
