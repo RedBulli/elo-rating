@@ -78,6 +78,8 @@ GEM
     nokogiri (1.6.7.2)
       mini_portile2 (~> 2.0.0.rc2)
     puma (2.16.0)
+    purecss-rails (0.6.0)
+      railties (>= 3.2.6, < 5)
     rack (2.0.0.alpha)
       json
     rack-test (0.6.3)
@@ -142,6 +144,7 @@ DEPENDENCIES
   jbuilder (~> 2.0)
   jquery-rails
   puma
+  purecss-rails
   rails (>= 5.0.0.beta1, < 5.1)
   spring
   sqlite3
