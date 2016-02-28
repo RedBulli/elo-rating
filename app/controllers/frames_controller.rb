@@ -5,7 +5,7 @@ class FramesController < ApplicationController
       player2_elo: player_elos[1],
       winner: winner
     )
-    redirect_to players_url
+    redirect_to root_url
   end
 
   private

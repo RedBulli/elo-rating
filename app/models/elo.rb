@@ -3,6 +3,6 @@ class Elo < ActiveRecord::Base
   validates :player, presence: true
 
   def name
-    "#{player.name} (#{rating})"
+    "#{player.name} (#{rating.to_i})"
   end
 end
