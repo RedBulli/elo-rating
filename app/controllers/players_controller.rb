@@ -6,7 +6,9 @@ class PlayersController < ApplicationController
         breaker_is_winner: frame.player1_elo.player == frame.winner,
         player1: frame.player1_elo.player,
         player2: frame.player2_elo.player,
-        created_at: frame.created_at
+        created_at: frame.created_at,
+        deletable: frame.deletable?,
+        model: frame
       }
     end
   end

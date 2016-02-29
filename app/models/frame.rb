@@ -17,6 +17,10 @@ class Frame < ActiveRecord::Base
     player2_elo.player.save
   end
 
+  def deletable?
+    false
+  end
+
   private
 
   def elos_unique

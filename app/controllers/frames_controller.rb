@@ -9,7 +9,25 @@ class FramesController < ApplicationController
     redirect_to root_url
   end
 
+  def destroy
+    frame = Frame.find(params[:id])
+    render '401', status: 401 unless frame.deletable?
+    restore_player_elos(frame)
+    frame.destroy!
+    redirect_to root_url
+  end
+
   private
+
+  def restore_player_elos(frame)
+    [frame.player1_elo, frame.player2_elo].each do |previous_elo|
+      player = previous_elo.player
+      changed_elo = player.elo
+      player.elo = previous_elo
+      changed_elo.destroy!
+      player.save!
+    end
+  end
 
   def permitted_params
     params.require(:winner)

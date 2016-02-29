@@ -37,6 +37,11 @@
             <% else %>
               <%= frame[:player1].name %> - <b><%= frame[:player2].name %></b>
             <% end %>
+            <% if frame[:deletable] %>
+              <%= form_for(frame[:model], method: :delete, data: { confirm: 'Are you sure?' }) do %>
+                <button>DELETE</button>
+              <% end %>
+            <% end %>
           </li>
         <%end %>
       </ol>

@@ -5,5 +5,5 @@ Rails.application.routes.draw do
   # mount ActionCable.server => '/cable'
   root 'players#index'
   resources :players, only: [:index]
-  resources :frames, only: [:create]
+  resources :frames, only: [:create, :destroy]
 end
