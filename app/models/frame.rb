@@ -4,6 +4,7 @@ class Frame < ActiveRecord::Base
   belongs_to :winner, class_name: 'Player'
   validates :player1_elo, :player2_elo, :winner, presence: true
   after_create :create_new_elos
+  validate :elos_unique
 
   def name
     "#{player1_elo.player.name} - #{player2_elo.player.name} (Winner: )"
@@ -17,6 +18,15 @@ class Frame < ActiveRecord::Base
   end
 
   private
+
+  def elos_unique
+    if Frame.where('player1_elo_id IN (?, ?)', player1_elo.id, player2_elo.id).exists?
+      errors.add(:player1_elo, 'Player 1 elo is already used in another frame')
+    end
+    if Frame.where('player2_elo_id IN (?, ?)', player1_elo.id, player2_elo.id).exists?
+      errors.add(:player2_elo, 'Player 2 elo is already used in another frame')
+    end
+  end
 
   def elo_change
     (result - ev) * k_factor
