@@ -30,10 +30,12 @@ class Frame < ActiveRecord::Base
   end
 
   def elos_unique
-    if Frame.where('player1_elo_id IN (?, ?)', player1_elo.id, player2_elo.id).exists?
+    frames1 = Frame.where('player1_elo_id IN (?, ?)', player1_elo.id, player2_elo.id).to_a
+    unless frames1 == [] || frames1 == [self]
       errors.add(:player1_elo, 'Player 1 elo is already used in another frame')
     end
-    if Frame.where('player2_elo_id IN (?, ?)', player1_elo.id, player2_elo.id).exists?
+    frames2 = Frame.where('player2_elo_id IN (?, ?)', player1_elo.id, player2_elo.id).to_a
+    unless frames2 == [] || frames2 == [self]
       errors.add(:player2_elo, 'Player 2 elo is already used in another frame')
     end
   end
