@@ -18,10 +18,16 @@ class Frame < ActiveRecord::Base
   end
 
   def deletable?
-    false
+    ![player1_elo, player2_elo].any? do |player_elo|
+      elo_player_has_newer_frames(player_elo)
+    end
   end
 
   private
+
+  def elo_player_has_newer_frames(player_elo)
+    Elo.where('player_id = ? AND id > ? AND id < ?', player_elo.player.id, player_elo.id, player_elo.player.elo).exists?
+  end
 
   def elos_unique
     if Frame.where('player1_elo_id IN (?, ?)', player1_elo.id, player2_elo.id).exists?
