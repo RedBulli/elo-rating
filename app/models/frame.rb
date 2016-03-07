@@ -7,7 +7,15 @@ class Frame < ActiveRecord::Base
   validate :elos_unique
 
   def name
-    "#{player1_elo.player.name} - #{player2_elo.player.name}"
+    "#{player1.name} - #{player2.name}"
+  end
+
+  def player1
+    player1_elo.player
+  end
+
+  def player2
+    player2_elo.player
   end
 
   def create_new_elos
@@ -45,7 +53,7 @@ class Frame < ActiveRecord::Base
   end
 
   def result
-    if winner == player1_elo.player
+    if winner == player1
       1
     else
       0

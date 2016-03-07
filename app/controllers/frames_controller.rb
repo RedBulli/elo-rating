@@ -61,14 +61,6 @@ class FramesController < ApplicationController
   end
 
   def get_or_create_player(name)
-    player = Player::find_or_create_by(name: name)
-    unless player.elo
-      elo = Elo.new(player: player)
-      elo.rating = 1500
-      player.elo = elo
-      player.save!
-      elo.save!
-    end
-    player
+    Player::find_or_create_by(name: name)
   end
 end

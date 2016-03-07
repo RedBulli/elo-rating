@@ -167,9 +167,6 @@ GEM
       rspec-mocks (~> 3.1.0)
       rspec-support (~> 3.1.0)
     rspec-support (3.1.2)
-    seed_dump (3.2.4)
-      activerecord (>= 4)
-      activesupport (>= 4)
     shellany (0.0.1)
     slop (3.6.0)
     spring (1.6.3)
@@ -211,7 +208,6 @@ DEPENDENCIES
   purecss-rails
   rails (>= 5.0.0.beta1, < 5.1)
   rspec-rails
-  seed_dump
   spring
   terminal-notifier-guard
   tzinfo-data
