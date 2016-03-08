@@ -27,5 +27,12 @@ RSpec.describe Player, type: :model do
         player.merge_player(alter_ego)
       }.to raise_error(RuntimeError)
     end
+
+    it 'destroys the other player' do
+      player = Player.create!(name: 'Sampo')
+      alter_ego = Player.create!(name: 'Bad Sampo')
+      player.merge_player(alter_ego)
+      expect(Player.find_by(id: alter_ego.id)).to eql(nil)
+    end
   end
 end

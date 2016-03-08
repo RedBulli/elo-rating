@@ -22,4 +22,21 @@ RSpec.describe RecalculateElosJob, type: :job do
     end
     expect(reloaded_players.sort_by { |p| -p.elo.rating }).to eql([players[1], players[0], players[2]])
   end
+
+  it 'should recalculate elos correctly when merging players' do
+    players = %w(Sampo Oskari Antti).map do |name|
+      Player.create!(name: name)
+    end
+    frames = [[2,0], [0,1], [2, 0]].map do |players_indexes|
+      Frame.create!(
+        player1_elo: players[players_indexes[0]].elo,
+        player2_elo: players[players_indexes[1]].elo,
+        winner: players[players_indexes[0]]
+      )
+    end
+    expect(players.sort_by { |p| -p.elo.rating }).to eql([players[2], players[0], players[1]])
+    players[1].merge_player(players[2])
+    RecalculateElosJob.perform_now
+    expect(Player.all.sort_by { |p| -p.elo.rating }).to eql([players[1], players[0]])
+  end
 end

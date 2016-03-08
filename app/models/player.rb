@@ -16,8 +16,10 @@ class Player < ActiveRecord::Base
       raise 'Merging players who have played against each other is not allowed'
     end
     ActiveRecord::Base.transaction do
+      player.elo.destroy
       Frame.where(winner: player).update_all(winner_id: self.id)
       Elo.where(player: player).update_all(player_id: self.id)
+      Player.destroy(player.id)
     end
   end
 
