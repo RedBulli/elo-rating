@@ -17,6 +17,6 @@ RSpec.describe Frame, type: :model do
     p3 = Player.create!(name: 'Antti')
     frame2 = Frame.create!(player1_elo: p3.elo, player2_elo: p2.elo, winner: p2)
     expect(frame.deletable?).to eql(false)
-    expect(frame2.deletable?).to eql(false)
+    expect(frame2.deletable?).to eql(true)
   end
 end

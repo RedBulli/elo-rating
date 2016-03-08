@@ -11,10 +11,13 @@ class FramesController < ApplicationController
 
   def destroy
     frame = Frame.find(params[:id])
-    render '401', status: 401 unless frame.deletable?
-    restore_player_elos(frame)
-    frame.destroy!
-    redirect_to root_url
+    if frame.deletable?
+      restore_player_elos(frame)
+      frame.destroy!
+      redirect_to root_url
+    else
+      render body: nil, status: 400
+    end
   end
 
   private
