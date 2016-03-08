@@ -31,7 +31,16 @@ class Frame < ActiveRecord::Base
     end
   end
 
+  def recalculate_elos
+    next_elo(player1_elo).update_attributes!(rating: player1_elo.rating + elo_change)
+    next_elo(player2_elo).update_attributes!(rating: player2_elo.rating - elo_change)
+  end
+
   private
+
+  def next_elo(player_elo)
+    Elo.where('player_id = ? AND id > ?', player_elo.player.id, player_elo.id).order('id ASC').first
+  end
 
   def elo_player_has_newer_frames(player_elo)
     Elo.where('player_id = ? AND id > ? AND id < ?', player_elo.player.id, player_elo.id, player_elo.player.elo).exists?
