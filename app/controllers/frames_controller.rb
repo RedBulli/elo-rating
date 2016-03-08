@@ -61,6 +61,6 @@ class FramesController < ApplicationController
   end
 
   def get_or_create_player(name)
-    Player::find_or_create_by(name: name)
+    Player::find_or_create_by_name(name)
   end
 end

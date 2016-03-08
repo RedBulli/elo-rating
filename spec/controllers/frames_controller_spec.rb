@@ -34,5 +34,13 @@ RSpec.describe FramesController, type: :controller do
       post :create, winner: 'Sampo', loser: 'Oskari', breaker: 'winner'
       expect(Frame.first.player1.name).to eql('Sampo')
     end
+
+    it "matches players even if capitalization is not same" do
+      Player.create!(name: 'Sampo')
+      expect {
+        post :create, winner: 'sampo', loser: 'Oskari', breaker: 'winner'
+      }.to change{Player.count}.from(1).to(2)
+      expect(Frame.first.player1.name).to eql('Sampo')
+    end
   end
 end
