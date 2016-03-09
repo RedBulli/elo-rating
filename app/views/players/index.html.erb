@@ -23,7 +23,7 @@
     <div class="pure-u-1 pure-u-md-1-3">
       <ol>
         <% @players.each do |player| %>
-          <li><%=player.elo.name%></li>
+          <li><%=player.name%> (<%=player.elo.rating.to_i%>)</li>
         <%end %>
       </ol>
     </div>
