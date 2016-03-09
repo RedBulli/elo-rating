@@ -12,4 +12,5 @@ test:
   database: elo_rating_test
 
 production:
-  url: <%= ENV['DATABASE_URL'] %>
+  <<: *default
+  database: elo_rating_production
