@@ -1,0 +1,7 @@
+web:
+  dockerfile: Dockerfile.prod
+  environment:
+    DATABASE_URL: 'postgresql://postgres@postgres/elo_rating_production'
+    RAILS_ENV: 'production'
+    RACK_ENV: 'production'
+  restart: always
