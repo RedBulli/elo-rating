@@ -6,6 +6,9 @@ postgres:
     POSTGRES_DB: 'elo_rating_development'
     POSTGRES_USER: 'elo_rating'
 
+redis:
+  image: redis
+
 web:
   build: .
   command: bundle exec foreman start
@@ -13,10 +16,12 @@ web:
     - .:/app
   links:
     - postgres
+    - redis
   ports:
     - "5000:5000"
   environment:
     DATABASE_URL: 'postgresql://postgres@postgres/elo_rating_development'
+    REDIS_URL: 'redis://redis:6379'
 
 test:
   build: .
@@ -27,5 +32,7 @@ test:
     - "7000:7000"
   links:
     - postgres
+    - redis
   environment:
     DATABASE_URL: 'postgresql://postgres@postgres/elo_rating_test'
+    REDIS_URL: 'redis://redis:6379'
