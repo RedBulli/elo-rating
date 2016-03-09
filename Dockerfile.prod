@@ -8,12 +8,8 @@ WORKDIR /app
 COPY .ruby-version Gemfile Gemfile.lock ./
 RUN bundle install --jobs 3 --retry 5 --without development test
 
-# Set Rails to run in production
-ENV RAILS_ENV production 
-ENV RACK_ENV production
-
 COPY . ./
 
-RUN bundle exec rake assets:precompile
+RUN bundle exec rake assets:precompile RAILS_ENV=production
 
 CMD bundle exec foreman start
