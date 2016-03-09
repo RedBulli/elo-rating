@@ -6,4 +6,7 @@ Rails.application.routes.draw do
   root 'players#index'
   resources :players, only: [:index]
   resources :frames, only: [:create, :destroy]
+
+  require 'sidekiq/web'
+  mount Sidekiq::Web => '/sidekiq'
 end

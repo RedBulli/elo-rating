@@ -18,6 +18,14 @@ class Frame < ActiveRecord::Base
     player2_elo.player
   end
 
+  def loser
+    if player1 == winner
+      player2
+    else
+      player1
+    end
+  end
+
   def create_new_elos
     player1_elo.player.elo = Elo.create!(player: player1_elo.player, rating: player1_elo.rating + elo_change)
     player2_elo.player.elo = Elo.create!(player: player2_elo.player, rating: player2_elo.rating - elo_change)

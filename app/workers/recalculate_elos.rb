@@ -1,7 +1,7 @@
-class RecalculateElosJob < ApplicationJob
-  queue_as :default
+class RecalculateElos
+  include Sidekiq::Worker
 
-  def perform()
+  def perform
     process_next_frame
   end
 

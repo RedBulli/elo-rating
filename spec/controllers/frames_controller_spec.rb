@@ -42,6 +42,14 @@ RSpec.describe FramesController, type: :controller do
       }.to change{Player.count}.from(1).to(2)
       expect(Frame.first.player1.name).to eql('Sampo')
     end
+
+    it 'posts the result to Flowdock' do
+      stub = stub_request(:post, "https://api.flowdock.com/v1/messages").to_return(status: 200, body: '')
+      Sidekiq::Testing.inline! do
+        process :create, method: :post, params: { winner: 'Sampo', loser: 'Oskari', breaker: 'winner' }
+        expect(stub).to have_been_requested
+      end
+    end
   end
 
   describe '#destroy' do

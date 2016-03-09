@@ -1,6 +1,7 @@
 require 'rails_helper'
+require 'sidekiq/testing'
 
-RSpec.describe RecalculateElosJob, type: :job do
+RSpec.describe RecalculateElos, type: :worker do
   it 'should recalculate elos' do
     players = %w(Sampo Oskari Antti).map do |name|
       Player.create!(name: name)
@@ -15,7 +16,9 @@ RSpec.describe RecalculateElosJob, type: :job do
     expect(players.sort_by { |p| -p.elo.rating }).to eql([players[0], players[1], players[2]])
     frames[0].winner = players[1]
     frames[0].save
-    RecalculateElosJob.perform_now
+    Sidekiq::Testing.inline! do
+      RecalculateElos.perform_async
+    end
     reloaded_players = players.map do |player|
       player.reload
       player
@@ -36,7 +39,9 @@ RSpec.describe RecalculateElosJob, type: :job do
     end
     expect(players.sort_by { |p| -p.elo.rating }).to eql([players[2], players[0], players[1]])
     players[1].merge_player(players[2])
-    RecalculateElosJob.perform_now
+    Sidekiq::Testing.inline! do
+      RecalculateElos.perform_async
+    end
     expect(Player.all.sort_by { |p| -p.elo.rating }).to eql([players[1], players[0]])
   end
 end

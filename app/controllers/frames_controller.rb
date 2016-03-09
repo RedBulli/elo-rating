@@ -1,11 +1,12 @@
 class FramesController < ApplicationController
   def create
     permitted_params
-    Frame.create!(
+    frame = Frame.create!(
       player1_elo: player1_elo,
       player2_elo: player2_elo,
       winner: winner
     )
+    PostResultToFlowdock.perform_async(frame.id)
     redirect_to root_url
   end
 
