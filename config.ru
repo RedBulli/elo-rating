@@ -2,6 +2,10 @@
 
 require ::File.expand_path('../config/environment', __FILE__)
 
+map ENV['RAILS_RELATIVE_URL_ROOT'] || '/' do
+  run Rails.application
+end
+
 # Action Cable uses EventMachine which requires that all classes are loaded in advance
 Rails.application.eager_load!
 
