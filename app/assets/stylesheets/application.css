@@ -13,4 +13,21 @@
  *= require_tree .
  *= require_self
  *= require purecss
+ *= require font-awesome
  */
+
+form.button-form {
+  display: inline-block;
+}
+
+form.button-form button {
+  background:none!important;
+  border:none;
+  padding:0!important;
+  font: inherit;
+  cursor: pointer;
+}
+
+.delete {
+  color: red;
+}

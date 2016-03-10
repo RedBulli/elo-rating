@@ -31,15 +31,15 @@
       <ol>
         <% @frames.each do |frame| %>
           <li>
-            <%=frame[:created_at].to_formatted_s(:short)%>
+            <%=frame[:created_at].localtime.to_formatted_s(:short)%>
             <% if frame[:breaker_is_winner] %>
               <b><%= frame[:player1].name %></b> - <%= frame[:player2].name %>
             <% else %>
               <%= frame[:player1].name %> - <b><%= frame[:player2].name %></b>
             <% end %>
             <% if frame[:deletable] %>
-              <%= form_for(frame[:model], method: :delete, data: { confirm: 'Are you sure?' }) do %>
-                <button>DELETE</button>
+              <%= form_for(frame[:model], method: :delete, data: { confirm: 'Are you sure?' }, html: { class: 'button-form delete' }) do %>
+                <button><i class="fa fa-trash"></i></button>
               <% end %>
             <% end %>
           </li>

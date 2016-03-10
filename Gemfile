@@ -20,6 +20,7 @@ gem 'jbuilder', '~> 2.0'
 gem 'puma'
 
 gem 'purecss-rails'
+gem 'font-awesome-rails'
 
 gem 'faraday'
 gem 'faraday_middleware'
