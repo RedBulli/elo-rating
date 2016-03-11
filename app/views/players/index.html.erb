@@ -23,9 +23,10 @@
     <div class="pure-u-1 pure-u-md-1-3">
       <ol>
         <% @players.each do |player| %>
-          <li><%=player.name%> (<%=player.elo.rating.to_i%>)</li>
+          <li><%=player.name%> (<%=player.elo.rating.to_i%>)<% if player.elo.provisional? %>*<% end %></li>
         <%end %>
       </ol>
+      <p>* means provisional elo. Elos will change 3 times faster when provisional</p>
     </div>
     <div class="pure-u-1 pure-u-md-2-3">
       <ol>

@@ -27,32 +27,24 @@ class Frame < ActiveRecord::Base
   end
 
   def create_new_elos
-    player1_elo.player.elo = Elo.create!(player: player1_elo.player, rating: player1_elo.rating + elo_change)
-    player2_elo.player.elo = Elo.create!(player: player2_elo.player, rating: player2_elo.rating - elo_change)
+    player1_elo.player.elo = Elo.create!(player: player1_elo.player, rating: player1_elo.rating + elo_change(player1_elo))
+    player2_elo.player.elo = Elo.create!(player: player2_elo.player, rating: player2_elo.rating + elo_change(player2_elo))
     player1_elo.player.save
     player2_elo.player.save
   end
 
   def deletable?
     ![player1_elo, player2_elo].any? do |player_elo|
-      elo_player_has_newer_frames(player_elo)
+      player_elo.player_has_newer_frames?
     end
   end
 
   def recalculate_elos
-    next_elo(player1_elo).update_attributes!(rating: player1_elo.rating + elo_change)
-    next_elo(player2_elo).update_attributes!(rating: player2_elo.rating - elo_change)
+    player1_elo.next_elo.update_attributes!(rating: player1_elo.rating + elo_change(player1_elo))
+    player2_elo.next_elo.update_attributes!(rating: player2_elo.rating + elo_change(player2_elo))
   end
 
   private
-
-  def next_elo(player_elo)
-    Elo.where('player_id = ? AND id > ?', player_elo.player.id, player_elo.id).order('id ASC').first
-  end
-
-  def elo_player_has_newer_frames(player_elo)
-    Elo.where('player_id = ? AND id > ? AND id < ?', player_elo.player.id, player_elo.id, player_elo.player.elo).exists?
-  end
 
   def elos_unique
     frames1 = Frame.where('player1_elo_id IN (?, ?)', player1_elo.id, player2_elo.id).to_a
@@ -65,35 +57,23 @@ class Frame < ActiveRecord::Base
     end
   end
 
-  def elo_change
-    (result - ev) * k_factor
+  def opponent_elo(player_elo)
+    if player_elo == player1_elo
+      player2_elo
+    else
+      player1_elo
+    end
   end
 
-  def result
-    if winner == player1
+  def elo_change(player_elo)
+    (result(player_elo) - player_elo.ev(opponent_elo(player_elo))) * player_elo.k_factor
+  end
+
+  def result(player_elo)
+    if winner == player_elo.player
       1
     else
       0
     end
-  end
-
-  def ev
-    if elo_difference < 0
-      1 - favorite_ev
-    else
-      favorite_ev
-    end
-  end
-
-  def favorite_ev
-    1.0/(1.0+10.0**(elo_difference.to_d.abs/400.0))
-  end
-
-  def elo_difference
-    player2_elo.rating - player1_elo.rating 
-  end
-
-  def k_factor
-    10.0
   end
 end
