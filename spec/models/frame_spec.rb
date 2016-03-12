@@ -21,31 +21,4 @@ RSpec.describe Frame, type: :model do
     expect(frame.deletable?).to eql(false)
     expect(frame2.deletable?).to eql(true)
   end
-
-  it 'create uses larger K-factor when players have provisional elos' do
-    frame = Frame.create!(player1_elo: player1.elo, player2_elo: player2.elo, winner: player2)
-    expect(player1.elo.rating).to eql(1485)
-    expect(player2.elo.rating).to eql(1515)
-  end
-
-  it 'creates uses base K-factor when players do not have provisional elos' do
-    15.times do
-      create_frame
-    end
-    player1.elo.rating = 1500
-    player2.elo.rating = 1500
-    frame = Frame.create!(player1_elo: player1.elo, player2_elo: player2.elo, winner: player2)
-    expect(player1.elo.rating).to eql(1495)
-    expect(player2.elo.rating).to eql(1505)
-  end
-
-  it 'creates uses different K-factors if one has provisional elo' do
-    15.times do
-      create_frame
-    end
-    player1.elo.rating = 1500
-    frame = Frame.create!(player1_elo: player1.elo, player2_elo: player3.elo, winner: player1)
-    expect(player1.elo.rating).to eql(1505)
-    expect(player3.elo.rating).to eql(1485)
-  end
 end

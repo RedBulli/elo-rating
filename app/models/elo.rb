@@ -24,9 +24,11 @@ class Elo < ActiveRecord::Base
     Elo.where('player_id = ? AND id > ? AND id < ?', player.id, id, player.elo).exists?
   end
 
-  def k_factor
+  def k_factor(opponent_elo)
     if provisional?
       BASE_K_FACTOR * 3
+    elsif opponent_elo.provisional?
+      BASE_K_FACTOR / 2
     else
       BASE_K_FACTOR
     end

@@ -66,7 +66,7 @@ class Frame < ActiveRecord::Base
   end
 
   def elo_change(player_elo)
-    (result(player_elo) - player_elo.ev(opponent_elo(player_elo))) * player_elo.k_factor
+    (result(player_elo) - player_elo.ev(opponent_elo(player_elo))) * player_elo.k_factor(opponent_elo(player_elo))
   end
 
   def result(player_elo)
