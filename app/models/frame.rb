@@ -1,10 +1,13 @@
 class Frame < ActiveRecord::Base
+  extend Enumerize
+
   belongs_to :player1_elo, class_name: 'Elo'
   belongs_to :player2_elo, class_name: 'Elo'
   belongs_to :winner, class_name: 'Player'
   validates :player1_elo, :player2_elo, :winner, presence: true
   after_create :create_new_elos
   validate :elos_unique
+  enumerize :game_type, in: ['eight_ball', 'nine_ball', 'one_pocket'], default: 'eight_ball'
 
   def name
     "#{player1.name} - #{player2.name}"

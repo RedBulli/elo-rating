@@ -11,7 +11,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160226141742) do
+ActiveRecord::Schema.define(version: 20160312144626) do
+
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
 
   create_table "elos", force: :cascade do |t|
     t.integer "player_id"
@@ -19,11 +22,12 @@ ActiveRecord::Schema.define(version: 20160226141742) do
   end
 
   create_table "frames", force: :cascade do |t|
-    t.integer  "player1_elo_id", null: false
-    t.integer  "player2_elo_id", null: false
-    t.integer  "winner_id",      null: false
-    t.datetime "created_at",     null: false
-    t.datetime "updated_at",     null: false
+    t.integer  "player1_elo_id",                        null: false
+    t.integer  "player2_elo_id",                        null: false
+    t.integer  "winner_id",                             null: false
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
+    t.string   "game_type",      default: "eight_ball", null: false
   end
 
   create_table "players", force: :cascade do |t|

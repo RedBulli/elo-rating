@@ -15,6 +15,16 @@
         <label for="breaker-loser">Breaker</label>
       </fieldset>
       <fieldset>
+        <label for="game_type">Game</label>
+        <select name="game_type">
+          <% @game_types.each do |game_type| %>
+            <option value="<%= game_type[:value] %>">
+              <%= game_type[:name] %>
+            </option>
+          <%end %>
+        </select>
+      </fieldset>
+      <fieldset>
         <button class="pure-button pure-button-primary">Save result</button>
       </fieldset>
     <% end %>

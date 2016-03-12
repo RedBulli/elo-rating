@@ -1,4 +1,10 @@
-class PlayersController < ApplicationController
+class HomeController < ApplicationController
+  GAME_NAME_MAPPINGS = {
+    'eight_ball' => '8 ball',
+    'nine_ball' => '9 ball',
+    'one_pocket' => 'One pocket'
+  }
+
   def index
     @players = Player.includes(:elo).all.order('elos.rating DESC')
     last_frame = Frame.order('id DESC').first
@@ -10,6 +16,18 @@ class PlayersController < ApplicationController
         created_at: frame.created_at,
         deletable: frame == last_frame,
         model: frame
+      }
+    end
+    @game_types = game_types
+  end
+
+  private
+
+  def game_types
+    Frame.game_type.values.map do |game_type|
+      {
+        value: game_type,
+        name: GAME_NAME_MAPPINGS[game_type]
       }
     end
   end
