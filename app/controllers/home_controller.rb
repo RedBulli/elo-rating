@@ -1,9 +1,18 @@
 class HomeController < ApplicationController
-  GAME_NAME_MAPPINGS = {
-    'eight_ball' => '8 ball',
-    'nine_ball' => '9 ball',
-    'one_pocket' => 'One pocket'
-  }
+  GAME_NAME_MAPPINGS = [
+    {
+      value: 'eight_ball',
+      name: '8 ball'
+    },
+    {
+      value: 'nine_ball',
+      name: '9 ball'
+    },
+    {
+      value: 'one_pocket',
+      name: 'One pocket'
+    }
+  ]
 
   def index
     @players = Player.includes(:elo).all.order('elos.rating DESC')
@@ -18,17 +27,6 @@ class HomeController < ApplicationController
         model: frame
       }
     end
-    @game_types = game_types
-  end
-
-  private
-
-  def game_types
-    Frame.game_type.values.map do |game_type|
-      {
-        value: game_type,
-        name: GAME_NAME_MAPPINGS[game_type]
-      }
-    end
+    @game_types = GAME_NAME_MAPPINGS
   end
 end

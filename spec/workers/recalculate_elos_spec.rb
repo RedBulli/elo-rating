@@ -10,7 +10,8 @@ RSpec.describe RecalculateElos, type: :worker do
       Frame.create!(
         player1_elo: players[players_indexes[0]].elo,
         player2_elo: players[players_indexes[1]].elo,
-        winner: players[players_indexes[0]]
+        winner: players[players_indexes[0]],
+        game_type: 'eight_ball'
       )
     end
     expect(players.sort_by { |p| -p.elo.rating }).to eql([players[0], players[1], players[2]])
@@ -34,7 +35,8 @@ RSpec.describe RecalculateElos, type: :worker do
       Frame.create!(
         player1_elo: players[players_indexes[0]].elo,
         player2_elo: players[players_indexes[1]].elo,
-        winner: players[players_indexes[0]]
+        winner: players[players_indexes[0]],
+        game_type: 'eight_ball'
       )
     end
     expect(players.sort_by { |p| -p.elo.rating }).to eql([players[2], players[0], players[1]])

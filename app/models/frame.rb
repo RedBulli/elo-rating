@@ -1,13 +1,12 @@
 class Frame < ActiveRecord::Base
-  extend Enumerize
-
   belongs_to :player1_elo, class_name: 'Elo'
   belongs_to :player2_elo, class_name: 'Elo'
   belongs_to :winner, class_name: 'Player'
   validates :player1_elo, :player2_elo, :winner, presence: true
   after_create :create_new_elos
   validate :elos_unique
-  enumerize :game_type, in: ['eight_ball', 'nine_ball', 'one_pocket'], default: 'eight_ball'
+  validates :game_type, inclusion: { in: %w(eight_ball nine_ball one_pocket) }
+  validate :validate_winner_is_either_player
 
   def name
     "#{player1.name} - #{player2.name}"
@@ -48,6 +47,12 @@ class Frame < ActiveRecord::Base
   end
 
   private
+
+  def validate_winner_is_either_player
+    unless [player1_elo.player, player2_elo.player].include? winner
+      errors.add(:winner, 'Winner has to be either player')
+    end
+  end
 
   def elos_unique
     frames1 = Frame.where('player1_elo_id IN (?, ?)', player1_elo.id, player2_elo.id).to_a

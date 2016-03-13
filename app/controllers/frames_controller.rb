@@ -4,7 +4,8 @@ class FramesController < ApplicationController
     frame = Frame.create!(
       player1_elo: player1_elo,
       player2_elo: player2_elo,
-      winner: winner
+      winner: winner,
+      game_type: params[:game_type]
     )
     PostResultToFlowdock.perform_async(frame.id)
     redirect_to root_url
@@ -37,7 +38,8 @@ class FramesController < ApplicationController
     params.require(:winner)
     params.require(:loser)
     params.require(:breaker)
-    params.permit(:winner, :loser, :breaker)
+    params.require(:game_type)
+    params.permit(:winner, :loser, :breaker, :game_type)
   end
 
   def player1_elo

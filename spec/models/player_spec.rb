@@ -11,10 +11,10 @@ RSpec.describe Player, type: :model do
       player = Player.create!(name: 'Sampo')
       alter_ego = Player.create!(name: 'Bad Sampo')
       opponent = Player.create!(name: 'Oskari')
-      Frame.create!(player1_elo: player.elo, player2_elo: opponent.elo, winner: player)
-      Frame.create!(player1_elo: alter_ego.elo, player2_elo: opponent.elo, winner: opponent)
-      Frame.create!(player1_elo: alter_ego.elo, player2_elo: opponent.elo, winner: alter_ego)
-      Frame.create!(player1_elo: player.elo, player2_elo: opponent.elo, winner: player)
+      Frame.create!(player1_elo: player.elo, player2_elo: opponent.elo, winner: player, game_type: 'eight_ball')
+      Frame.create!(player1_elo: alter_ego.elo, player2_elo: opponent.elo, winner: opponent, game_type: 'eight_ball')
+      Frame.create!(player1_elo: alter_ego.elo, player2_elo: opponent.elo, winner: alter_ego, game_type: 'eight_ball')
+      Frame.create!(player1_elo: player.elo, player2_elo: opponent.elo, winner: player, game_type: 'eight_ball')
       player.merge_player(alter_ego)
       expect(Frame.where(winner: player).count).to eql(3)
     end
@@ -22,7 +22,7 @@ RSpec.describe Player, type: :model do
     it "doesn't allow merge if the players have played against each other" do
       player = Player.create!(name: 'Sampo')
       alter_ego = Player.create!(name: 'Bad Sampo')
-      Frame.create!(player1_elo: player.elo, player2_elo: alter_ego.elo, winner: player)
+      Frame.create!(player1_elo: player.elo, player2_elo: alter_ego.elo, winner: player, game_type: 'eight_ball')
       expect {
         player.merge_player(alter_ego)
       }.to raise_error(RuntimeError)

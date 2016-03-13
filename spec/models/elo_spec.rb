@@ -6,7 +6,7 @@ RSpec.describe Elo, type: :model do
   let(:player3) { Player.create! name: 'Antti' }
 
   def create_frame
-    Frame.create! player1_elo: player1.elo, player2_elo: player2.elo, winner: player1
+    Frame.create! player1_elo: player1.elo, player2_elo: player2.elo, winner: player1, game_type: 'eight_ball'
   end
 
   it 'provisional? should return true when less than and false when more than 15 previous elos' do
@@ -18,7 +18,7 @@ RSpec.describe Elo, type: :model do
 
   describe 'K-factor' do
     it 'is larger when players have provisional elos' do
-      frame = Frame.create!(player1_elo: player1.elo, player2_elo: player2.elo, winner: player2)
+      frame = Frame.create!(player1_elo: player1.elo, player2_elo: player2.elo, winner: player2, game_type: 'eight_ball')
       expect(player1.elo.rating).to eql(1485)
       expect(player2.elo.rating).to eql(1515)
     end
@@ -27,7 +27,7 @@ RSpec.describe Elo, type: :model do
       15.times { create_frame }
       player1.elo.rating = 1500
       player2.elo.rating = 1500
-      frame = Frame.create!(player1_elo: player1.elo, player2_elo: player2.elo, winner: player2)
+      frame = Frame.create!(player1_elo: player1.elo, player2_elo: player2.elo, winner: player2, game_type: 'eight_ball')
       expect(player1.elo.rating).to eql(1495)
       expect(player2.elo.rating).to eql(1505)
     end
