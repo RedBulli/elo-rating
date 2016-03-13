@@ -35,7 +35,7 @@ RSpec.describe FramesController, type: :controller do
       expect(Frame.first.player1.name).to eql('Sampo')
     end
 
-    it "matches players even if capitalization is not same" do
+    it 'matches players even if capitalization is not same' do
       Player.create!(name: 'Sampo')
       expect {
         process :create, method: :post, params: { winner: 'sampo', loser: 'Oskari', breaker: 'winner', game_type: 'nine_ball' }
@@ -43,8 +43,15 @@ RSpec.describe FramesController, type: :controller do
       expect(Frame.first.player1.name).to eql('Sampo')
     end
 
+    it 'uses the given props' do
+      process :create, method: :post, params: { winner: 'sampo', loser: 'Oskari', breaker: 'winner', game_type: 'nine_ball' }
+      frame = Frame.first
+      expect(frame.winner.name).to eql('sampo')
+      expect(frame.game_type).to eql('nine_ball')
+    end
+
     it 'posts the result to Flowdock' do
-      stub = stub_request(:post, "https://api.flowdock.com/v1/messages").to_return(status: 200, body: '')
+      stub = stub_request(:post, 'https://api.flowdock.com/v1/messages').to_return(status: 200, body: '')
       Sidekiq::Testing.inline! do
         process :create, method: :post, params: { winner: 'Sampo', loser: 'Oskari', breaker: 'winner', game_type: 'nine_ball' }
         expect(stub).to have_been_requested
