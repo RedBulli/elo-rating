@@ -1,0 +1,6 @@
+<ul>
+  <li>Name: <%= @player.name %></li>
+  <li>Rating: <%= @player.elo.rating.to_i %><% if @player.elo.provisional? %>*<% end %></li>
+  <li>Wins: <%= @player.win_count %>
+  <li>Losses: <%= @player.loss_count %>
+</ul>

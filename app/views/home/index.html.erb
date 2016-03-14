@@ -34,7 +34,7 @@
       <h2>Ratings</h2>
       <ol>
         <% @established_ratings.each do |player| %>
-          <li><%=player.name%> (<%=player.elo.rating.to_i%>) [<%=player.frames_count%>]</li>
+          <li><%= link_to player.name, player %> (<%=player.elo.rating.to_i%>) [<%=player.frames_count%>]</li>
         <%end %>
       </ol>
     </div>
@@ -42,7 +42,7 @@
       <h2>Provisional ratings (under 15 frames)</h2>
       <ol>
         <% @provisional_ratings.each do |player| %>
-          <li><%=player.name%> (<%=player.elo.rating.to_i%>) [<%=player.frames_count%>]</li>
+          <li><%= link_to player.name, player %> (<%=player.elo.rating.to_i%>) [<%=player.frames_count%>]</li>
         <%end %>
       </ol>
       <p>Provisional ratings will change 3 times faster when provisional</p>
@@ -53,9 +53,9 @@
           <li>
             <%=frame[:created_at].in_time_zone('Helsinki').to_formatted_s(:short)%>
             <% if frame[:breaker_is_winner] %>
-              <b><%= frame[:player1].name %></b> - <%= frame[:player2].name %>
+              <b><%= link_to frame[:player1].name, frame[:player1] %></b> - <%= link_to frame[:player2].name, frame[:player2] %>
             <% else %>
-              <%= frame[:player1].name %> - <b><%= frame[:player2].name %></b>
+              <%= link_to frame[:player1].name, frame[:player1] %> - <b><%= link_to frame[:player2].name, frame[:player2] %></b>
             <% end %>
             <% if frame[:deletable] %>
               <%= form_for(frame[:model], method: :delete, data: { confirm: 'Are you sure?' }, html: { class: 'button-form delete' }) do %>

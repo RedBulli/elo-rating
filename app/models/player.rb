@@ -48,6 +48,14 @@ class Player < ActiveRecord::Base
     elos.count - 1
   end
 
+  def win_count
+    Frame.where(winner: self).count
+  end
+
+  def loss_count
+    frames_count - win_count
+  end
+
   private
 
   def frames_for_this_week

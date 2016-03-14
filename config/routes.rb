@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   # mount ActionCable.server => '/cable'
   root 'home#index'
   resources :frames, only: [:create, :destroy]
+  resources :players, only: [:show]
 
   require 'sidekiq/web'
   Sidekiq::Web.use Rack::Auth::Basic do |username, password|
