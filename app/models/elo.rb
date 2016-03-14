@@ -12,6 +12,10 @@ class Elo < ActiveRecord::Base
     past_elos_count < 15
   end
 
+  def frame
+    Frame.where('player1_elo_id = ? OR player2_elo_id = ?', id, id)
+  end
+
   def next_elo
     Elo.where('player_id = ? AND id > ?', player.id, id).order('id ASC').first
   end

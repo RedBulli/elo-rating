@@ -10,13 +10,12 @@ RSpec.describe Frame, type: :model do
   end
 
   it 'creates new elos for players after creation' do
-    #frame = FactoryGirl.create(:frame)
-    frame = Frame.create!(player1_elo: player1.elo, player2_elo: player2.elo, winner: player2, game_type: 'eight_ball')
-    expect(player1.elo.rating < player2.elo.rating).to eql(true)
+    create_frame
+    expect(player1.elo.rating > player2.elo.rating).to eql(true)
   end
 
   it 'is deletable only if either of the player has not played frames after this' do
-    frame = Frame.create!(player1_elo: player1.elo, player2_elo: player2.elo, winner: player2, game_type: 'eight_ball')
+    frame = create_frame
     expect(frame.deletable?).to eql(true)
     frame2 = Frame.create!(player1_elo: player3.elo, player2_elo: player2.elo, winner: player2, game_type: 'eight_ball')
     expect(frame.deletable?).to eql(false)

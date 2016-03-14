@@ -12,7 +12,8 @@ class PostResultToFlowdock
       },
       external_thread_id: date_str,
       thread: {
-        title: "Pool results for #{date_str}"
+        title: "Pool results for #{date_str}",
+        body: thread_body
       }
     )
   end
@@ -24,6 +25,26 @@ class PostResultToFlowdock
       "#{player.name} (B)"
     else
       player.name
+    end
+  end
+
+  def thread_body
+    players = weekly_performances.map do |player|
+      "<li>#{player[:name]} #{player[:performance].to_i}</li>"
+    end
+    "<h4>This weeks performance ratings</h4><ul>#{players.join("")}</ul>"
+  end
+
+  def weekly_performances
+    Player.all.map do |player|
+      if performance = player.performance
+        {
+          name: player.name,
+          performance: performance
+        }
+      end
+    end.compact.sort_by do |item|
+      -item[:performance]
     end
   end
 

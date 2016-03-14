@@ -8,6 +8,8 @@ class Frame < ActiveRecord::Base
   validates :game_type, inclusion: { in: %w(eight_ball nine_ball one_pocket) }
   validate :validate_winner_is_either_player
 
+  scope :created_this_week, -> { where('frames.created_at >= ?', Time.now.at_beginning_of_week) }
+
   def name
     "#{player1.name} - #{player2.name}"
   end
@@ -44,6 +46,14 @@ class Frame < ActiveRecord::Base
   def recalculate_elos
     player1_elo.next_elo.update_attributes!(rating: player1_elo.rating + elo_change(player1_elo))
     player2_elo.next_elo.update_attributes!(rating: player2_elo.rating + elo_change(player2_elo))
+  end
+
+  def opponent_elo_of_player(player)
+    if player1_elo.player == player
+      player2_elo
+    else
+      player1_elo
+    end
   end
 
   private

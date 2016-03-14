@@ -1,6 +1,7 @@
 class Player < ActiveRecord::Base
   belongs_to :elo, autosave: true
   validates :name, length: { minimum: 1 }, uniqueness: { case_sensitive: false }
+  has_many :elos
 
   def initialize(attributes={})
     super
@@ -23,10 +24,34 @@ class Player < ActiveRecord::Base
     end
   end
 
+  def performance
+    frames = frames_for_this_week
+    if frames.count > 0
+      result = frames.reduce({total_opponents_ratings: 0.0, result: 0}) do |memo, frame|
+        memo[:result] +=
+          if frame.winner == self
+            1
+          else
+            -1
+          end
+        memo[:total_opponents_ratings] += frame.opponent_elo_of_player(self).rating
+        memo
+      end
+      (result[:total_opponents_ratings] + 400 * result[:result]) / frames.count
+    end
+  end
+
   private
 
+  def frames_for_this_week
+    Frame
+      .created_this_week
+      .joins(player1_elo: :player, player2_elo: :player)
+      .where('players.id = ? OR players_elos.id = ?', id, id)
+  end
+
   def frames_against_with(player)
-     Frame
+    Frame
       .joins(player1_elo: :player, player2_elo: :player)
       .where('(players.id = ? OR players.id = ?) AND (players_elos.id = ? OR players_elos.id = ?)', id, player.id, id, player.id)
   end
