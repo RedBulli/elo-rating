@@ -28,5 +28,12 @@ class HomeController < ApplicationController
       }
     end
     @game_types = GAME_NAME_MAPPINGS
+    @established_ratings = @players.reject do |player|
+      player.elo.provisional?
+    end
+
+    @provisional_ratings = @players.reject do |player|
+      !player.elo.provisional?
+    end
   end
 end

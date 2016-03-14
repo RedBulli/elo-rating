@@ -37,8 +37,15 @@ class Player < ActiveRecord::Base
         memo[:total_opponents_ratings] += frame.opponent_elo_of_player(self).rating
         memo
       end
-      (result[:total_opponents_ratings] + 400 * result[:result]) / frames.count
+      {
+        performance: (result[:total_opponents_ratings] + 400 * result[:result]) / frames.count,
+        frames: frames.count
+      }
     end
+  end
+
+  def frames_count
+    elos.count - 1
   end
 
   private

@@ -30,7 +30,7 @@ class PostResultToFlowdock
 
   def thread_body
     players = weekly_performances.map do |player|
-      "<li>#{player[:name]} #{player[:performance].to_i}</li>"
+      "<li>#{player[:name]} #{player[:performance][:performance].to_i} (#{player[:performance][:frames]})</li>"
     end
     "<h4>This weeks performance ratings</h4><ul>#{players.join("")}</ul>"
   end
@@ -44,7 +44,7 @@ class PostResultToFlowdock
         }
       end
     end.compact.sort_by do |item|
-      -item[:performance]
+      -item[:performance][:performance]
     end
   end
 
@@ -56,7 +56,7 @@ class PostResultToFlowdock
     Faraday.new(url: 'https://api.flowdock.com') do |faraday|
       faraday.request :json
       faraday.response :json
-      faraday.adapter  Faraday.default_adapter  # make requests with Net::HTTP
+      faraday.adapter  Faraday.default_adapter
     end
   end
 end
