@@ -29,6 +29,7 @@ gem 'sidekiq'
 gem 'sinatra', github: 'sinatra/sinatra', require: false
 
 gem 'skylight'
+gem 'newrelic_rpm', '~> 3.15', '>= 3.15.0.314'
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
