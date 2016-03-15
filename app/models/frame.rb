@@ -56,6 +56,22 @@ class Frame < ActiveRecord::Base
     end
   end
 
+  def result(player_elo)
+    if winner == player_elo.player
+      1
+    else
+      0
+    end
+  end
+
+  def opponent_elo(player_elo)
+    if player_elo == player1_elo
+      player2_elo
+    else
+      player1_elo
+    end
+  end
+
   private
 
   def validate_winner_is_either_player
@@ -75,23 +91,7 @@ class Frame < ActiveRecord::Base
     end
   end
 
-  def opponent_elo(player_elo)
-    if player_elo == player1_elo
-      player2_elo
-    else
-      player1_elo
-    end
-  end
-
   def elo_change(player_elo)
     (result(player_elo) - player_elo.ev(opponent_elo(player_elo))) * player_elo.k_factor(opponent_elo(player_elo))
-  end
-
-  def result(player_elo)
-    if winner == player_elo.player
-      1
-    else
-      0
-    end
   end
 end
