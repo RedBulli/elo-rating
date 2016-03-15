@@ -1,14 +1,14 @@
 class PlayersController < ApplicationController
   def show
     @player = Player.find(params[:id])
-    @elos = @player.elos.order('id DESC').map do |elo|
-      if elo.frame.first
+    @elos = @player.elos.map do |elo|
+      if elo.frame
         {
           elo: elo,
-          won: elo.frame.first.result(elo) == 1,
-          opponent: elo.frame.first.opponent_elo(elo)
+          won: elo.frame.result(elo) == 1,
+          opponent: elo.frame.opponent_elo(elo)
         }
       end
-    end.compact
+    end.compact.sort { |elo| elo[:elo].frame.created_at.to_date }
   end
 end

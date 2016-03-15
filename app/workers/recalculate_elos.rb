@@ -16,9 +16,9 @@ class RecalculateElos
 
   def next_frame(frame = nil)
     if frame
-      Frame.where('id > ?', frame.id)
+      Frame.where('created_at > ?', frame.created_at)
     else
       Frame
-    end.order('id ASC').first
+    end.order('created_at ASC').first
   end
 end
