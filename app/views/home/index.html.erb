@@ -14,14 +14,16 @@
           <tbody>
             <tr>
               <td>
-                <select name="player1">
+                <select id="player1-selector" name="player1" class="player-selector">
+                  <option disabled selected value>-</option>
                   <% @players.sort_by(&:name).each do |player| %>
                     <option value="<%= player.id %>"><%= player.name %></option>
                   <% end %>
                 </select>
               </td>
               <td>
-                <select name="player2">
+                <select id="player2-selector" name="player2" class="player-selector">
+                  <option disabled selected value>-</option>
                   <% @players.sort_by(&:name).each do |player| %>
                     <option value="<%= player.id %>"><%= player.name %></option>
                   <% end %>
@@ -40,6 +42,11 @@
             <tr>
               <td><label>Won <input type="radio" name="winner" value="player1"></label></td>
               <td><label>Won <input type="radio" name="winner" value="player2"></label></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td id="player1_ev"></td>
+              <td id="player2_ev"></td>
               <td></td>
             </tr>
           </tbody>

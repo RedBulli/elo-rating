@@ -1,7 +1,7 @@
 class ElosController < ApplicationController
   def ev
-    player1_elo = Elo.find(params[:player1_elo])
-    player2_elo = Elo.find(params[:player2_elo])
+    player1_elo = Player.find(params[:player1]).elo
+    player2_elo = Player.find(params[:player2]).elo
     player1_ev = player1_elo.ev(player2_elo)
     player2_ev = 1.0 - player1_ev
     render json: {
