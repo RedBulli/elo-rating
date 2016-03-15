@@ -200,6 +200,8 @@ GEM
       concurrent-ruby (~> 1.0)
       connection_pool (~> 2.2, >= 2.2.0)
       redis (~> 3.2, >= 3.2.1)
+    skylight (0.10.3)
+      activesupport (>= 3.0.0)
     slop (3.6.0)
     spring (1.6.3)
     sprockets (3.5.2)
@@ -251,6 +253,7 @@ DEPENDENCIES
   rspec-sidekiq
   sidekiq
   sinatra!
+  skylight
   spring
   terminal-notifier-guard
   tzinfo-data
