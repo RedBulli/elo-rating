@@ -9,6 +9,6 @@ class PlayersController < ApplicationController
           opponent: elo.frame.opponent_elo(elo)
         }
       end
-    end.compact.sort { |elo| elo[:elo].frame.created_at.to_date }
+    end.compact.sort { |elo| elo[:elo].frame.created_at.to_time }
   end
 end
