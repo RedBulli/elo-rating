@@ -7,53 +7,34 @@ RSpec.describe FramesController, type: :controller do
     http_login
   end
 
+  let(:player_sampo) { Player.create!(name: 'Sampo') }
+  let(:player_oskari) { Player.create!(name: 'Oskari') }
+
   describe '#create' do
     it 'redirects to index' do
-      process :create, method: :post, params: { winner: 'Sampo', loser: 'Oskari', breaker: 'winner', game_type: 'eight_ball' }
+      process :create, method: :post, params: { winner: 'player1', player1: player_oskari.id, player2: player_sampo.id, game_type: 'eight_ball' }
       expect(response).to redirect_to('/')
     end
 
     it 'creates frame' do
       expect {
-        process :create, method: :post, params: { winner: 'Sampo', loser: 'Oskari', breaker: 'loser', game_type: 'eight_ball' }
+        process :create, method: :post, params: { winner: 'player1', player1: player_oskari.id, player2: player_sampo.id, game_type: 'eight_ball' }
       }.to change{Frame.count}.from(0).to(1)
     end
 
-    it 'creates the players if they are not found' do
-      expect {
-        process :create, method: :post, params: { winner: 'Sampo', loser: 'Oskari', breaker: 'winner', game_type: 'eight_ball' }
-      }.to change{Player.count}.from(0).to(2)
-    end
-
-    it 'uses the breaker as the player 1' do
-      process :create, method: :post, params: { winner: 'Sampo', loser: 'Oskari', breaker: 'loser', game_type: 'eight_ball' }
-      expect(Frame.first.player1.name).to eql('Oskari')
-    end
-
-    it 'uses the breaker as the player 1' do
-      process :create, method: :post, params: { winner: 'Sampo', loser: 'Oskari', breaker: 'winner', game_type: 'nine_ball' }
-      expect(Frame.first.player1.name).to eql('Sampo')
-    end
-
-    it 'matches players even if capitalization is not same' do
-      Player.create!(name: 'Sampo')
-      expect {
-        process :create, method: :post, params: { winner: 'sampo', loser: 'Oskari', breaker: 'winner', game_type: 'nine_ball' }
-      }.to change{Player.count}.from(1).to(2)
-      expect(Frame.first.player1.name).to eql('Sampo')
-    end
-
-    it 'uses the given props' do
-      process :create, method: :post, params: { winner: 'sampo', loser: 'Oskari', breaker: 'winner', game_type: 'nine_ball' }
+    it 'uses params correctly' do
+      process :create, method: :post, params: { winner: 'player2', player1: player_oskari.id, player2: player_sampo.id, game_type: 'nine_ball' }
       frame = Frame.first
-      expect(frame.winner.name).to eql('sampo')
+      expect(frame.player1).to eql(player_oskari)
+      expect(frame.player2).to eql(player_sampo)
+      expect(frame.winner).to eql(player_sampo)
       expect(frame.game_type).to eql('nine_ball')
     end
 
     it 'posts the result to Flowdock' do
       stub = stub_request(:post, 'https://api.flowdock.com/v1/messages').to_return(status: 200, body: '')
       Sidekiq::Testing.inline! do
-        process :create, method: :post, params: { winner: 'Sampo', loser: 'Oskari', breaker: 'winner', game_type: 'nine_ball' }
+        process :create, method: :post, params: { winner: 'player1', player1: player_oskari.id, player2: player_sampo.id, game_type: 'nine_ball' }
         expect(stub).to have_been_requested
       end
     end
