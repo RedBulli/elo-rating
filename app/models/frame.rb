@@ -61,8 +61,8 @@ class Frame < ActiveRecord::Base
   end
 
   def deletable?
-    ![player1_elo, player2_elo].any? do |player_elo|
-      player_elo.player_has_newer_frames?
+    ![player1_elo.player, player2_elo.player].any? do |player|
+      next_frame_for_player(player)
     end
   end
 

@@ -33,7 +33,7 @@
     <div class="pure-u-1 pure-u-md-1-3">
       <h2>Ratings</h2>
       <ol>
-        <% @established_ratings.each do |player| %>
+        <% @ratings[:established].each do |player| %>
           <li><%= link_to player.name, player %> (<%=player.elo.rating.to_i%>) [<%=player.frames_count%>]</li>
         <%end %>
       </ol>
@@ -41,7 +41,7 @@
     <div class="pure-u-1 pure-u-md-1-3">
       <h2>Provisional ratings (under 15 frames)</h2>
       <ol>
-        <% @provisional_ratings.each do |player| %>
+        <% @ratings[:provisional].each do |player| %>
           <li><%= link_to player.name, player %> (<%=player.elo.rating.to_i%>) [<%=player.frames_count%>]</li>
         <%end %>
       </ol>

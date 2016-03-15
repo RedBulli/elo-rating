@@ -56,6 +56,10 @@ class Player < ActiveRecord::Base
     frames_count - win_count
   end
 
+  def provisional?
+    (elos.count - 1) < 15
+  end
+
   private
 
   def frames_for_this_week

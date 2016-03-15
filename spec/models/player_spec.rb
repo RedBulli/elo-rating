@@ -51,7 +51,7 @@ RSpec.describe Player, type: :model do
         winner: player,
         game_type: 'eight_ball'
       )
-      expect(player.performance).to eql(1915)
+      expect(player.performance[:performance]).to eql(1915)
     end
   end
 end

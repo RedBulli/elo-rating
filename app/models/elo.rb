@@ -1,6 +1,7 @@
 class Elo < ActiveRecord::Base
   belongs_to :player
   validates :player, presence: true
+  scope :with_frames, -> { joins('LEFT OUTER JOIN frames ON (frames.player1_elo_id = elos.id OR frames.player2_elo_id = elos.id)') }
 
   BASE_K_FACTOR = 10
 
@@ -17,11 +18,14 @@ class Elo < ActiveRecord::Base
   end
 
   def past_elos_count
-    Elo.where('player_id = ? AND id < ?', player.id, id).count
-  end
-
-  def player_has_newer_frames?
-    Elo.where('player_id = ? AND id > ? AND id < ?', player.id, id, player.elo).exists?
+    if frame
+      Elo
+        .with_frames
+        .where('frames.created_at < ?', frame.created_at)
+        .count
+    else
+      player.elos.count - 1
+    end
   end
 
   def k_factor(opponent_elo)

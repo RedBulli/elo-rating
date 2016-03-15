@@ -15,9 +15,10 @@ class HomeController < ApplicationController
   ]
 
   def index
-    @players = Player.includes(:elo).all.order('elos.rating DESC')
-    last_frame = Frame.order('id DESC').first
-    @frames = Frame.includes(:player1_elo, :player2_elo).all.order(created_at: :desc).map do |frame|
+    @players = Player.includes(:elo).order('elos.rating DESC').to_a
+    frames = Frame.includes(:player1_elo, :player2_elo).order(created_at: :desc).to_a
+    last_frame = frames.last
+    @frames = frames.map do |frame|
       {
         breaker_is_winner: frame.player1 == frame.winner,
         player1: frame.player1,
@@ -28,12 +29,13 @@ class HomeController < ApplicationController
       }
     end
     @game_types = GAME_NAME_MAPPINGS
-    @established_ratings = @players.reject do |player|
-      player.elo.provisional?
-    end
-
-    @provisional_ratings = @players.reject do |player|
-      !player.elo.provisional?
+    @ratings = @players.reduce({established: [], provisional: []}) do |memo, player|
+      if player.provisional?
+        memo[:provisional] << player
+      else
+        memo[:established] << player
+      end
+      memo
     end
   end
 end
