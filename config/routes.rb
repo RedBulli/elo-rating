@@ -6,6 +6,8 @@ Rails.application.routes.draw do
   resources :frames, only: [:create, :destroy]
   resources :players, only: [:show, :create]
 
+  get '/ev', to: 'elos#ev'
+
   require 'sidekiq/web'
   Sidekiq::Web.use Rack::Auth::Basic do |username, password|
     username == ENV["SIDEKIQ_USERNAME"] && password == ENV["SIDEKIQ_PASSWORD"]
