@@ -2,6 +2,7 @@ class Elo < ActiveRecord::Base
   belongs_to :player
   validates :player, presence: true
   scope :with_frames, -> { joins('LEFT OUTER JOIN frames ON (frames.player1_elo_id = elos.id OR frames.player2_elo_id = elos.id)') }
+  scope :for_player_id, -> (player_id) { where('elos.player_id = ?', player_id) }
 
   BASE_K_FACTOR = 10
 
@@ -21,6 +22,7 @@ class Elo < ActiveRecord::Base
     if frame
       Elo
         .with_frames
+        .for_player_id(player_id)
         .where('frames.created_at < ?', frame.created_at)
         .count
     else

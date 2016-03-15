@@ -7,6 +7,7 @@ class Frame < ActiveRecord::Base
   validate :elos_unique
   validates :game_type, inclusion: { in: %w(eight_ball nine_ball one_pocket) }
   validate :validate_winner_is_either_player
+  validate :validate_different_players
 
   scope :created_this_week, -> { where('frames.created_at >= ?', Time.now.at_beginning_of_week) }
   scope :for_player, -> (player) do
@@ -100,6 +101,12 @@ class Frame < ActiveRecord::Base
   def validate_winner_is_either_player
     unless [player1_elo.player, player2_elo.player].include? winner
       errors.add(:winner, 'Winner has to be either player')
+    end
+  end
+
+  def validate_different_players
+    if player1_elo.player == player2_elo.player
+      errors.add(:player2_elo, 'Player 2 is the same as player 1')
     end
   end
 

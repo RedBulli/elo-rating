@@ -28,6 +28,21 @@ RSpec.describe Frame, type: :model do
     }.to raise_error(ActiveRecord::RecordInvalid)
   end
 
+  it 'does not allow same player for both elos' do
+    expect {
+      Frame.create!(player1_elo: player1.elo, player2_elo: player1.elo, winner: player1, game_type: 'eight_ball')
+    }.to raise_error(ActiveRecord::RecordInvalid)
+  end
+
+  it 'does not allow elos to be reused in multiple frames' do
+    elo1 = player1.elo
+    elo2 = player2.elo
+    Frame.create!(player1_elo: player1.elo, player2_elo: player2.elo, winner: player1, game_type: 'eight_ball')
+    expect {
+      Frame.create!(player1_elo: elo1, player2_elo: elo2, winner: player1, game_type: 'eight_ball')
+    }.to raise_error(ActiveRecord::RecordInvalid)
+  end
+
   describe 'game_type' do
     it 'does not allow incorrect game types' do
       expect {

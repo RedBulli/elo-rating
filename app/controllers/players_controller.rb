@@ -11,4 +11,9 @@ class PlayersController < ApplicationController
       end
     end.compact.sort_by { |elo| elo[:elo].frame.created_at }.reverse
   end
+
+  def create
+    Player.create!(name: params[:name])
+    redirect_to root_url
+  end
 end
