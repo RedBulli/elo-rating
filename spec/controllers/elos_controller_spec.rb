@@ -12,7 +12,17 @@ RSpec.describe ElosController, type: :controller do
 
   describe '#ev' do
     it 'returns the ev for the players' do
-      process :ev, method: :get, params: { player1_elo: player_sampo.elo.id, player2_elo: player_oskari.elo.id, game_type: 'eight_ball' }
+      Frame.create(
+        player1_elo: player_sampo.elo,
+        player2_elo: player_oskari.elo,
+        winner: player_sampo,
+        game_type: 'eight_ball'
+      )
+      player_sampo.elo.rating = 1500
+      player_sampo.elo.save
+      player_oskari.elo.rating = 1500
+      player_oskari.elo.save
+      process :ev, method: :get, params: { player1: player_sampo.id, player2: player_oskari.id, game_type: 'eight_ball' }
       expect(response.body).to eql({
         player1: {
           ev: 0.5,
@@ -23,7 +33,8 @@ RSpec.describe ElosController, type: :controller do
           ev: 0.5,
           elo_change_win: 15.0,
           elo_change_lose: -15.0
-        }
+        },
+        should_change_breaker: true
       }.to_json)
     end
   end

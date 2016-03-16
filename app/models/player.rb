@@ -60,6 +60,12 @@ class Player < ActiveRecord::Base
     (elos.count - 1) < 15
   end
 
+  def frames_against_with(player)
+    Frame
+      .joins(player1_elo: :player, player2_elo: :player)
+      .where('(players.id = ? OR players.id = ?) AND (players_elos.id = ? OR players_elos.id = ?)', id, player.id, id, player.id)
+  end
+
   private
 
   def frames_for_this_week
@@ -67,11 +73,5 @@ class Player < ActiveRecord::Base
       .created_this_week
       .joins(player1_elo: :player, player2_elo: :player)
       .where('players.id = ? OR players_elos.id = ?', id, id)
-  end
-
-  def frames_against_with(player)
-    Frame
-      .joins(player1_elo: :player, player2_elo: :player)
-      .where('(players.id = ? OR players.id = ?) AND (players_elos.id = ? OR players_elos.id = ?)', id, player.id, id, player.id)
   end
 end
