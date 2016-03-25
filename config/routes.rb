@@ -4,7 +4,7 @@ Rails.application.routes.draw do
   # mount ActionCable.server => '/cable'
   root 'home#index'
   resources :frames, only: [:create, :destroy]
-  resources :players, only: [:show, :create]
+  resources :players, only: [:show, :create, :index]
 
   get '/ev', to: 'elos#ev'
 

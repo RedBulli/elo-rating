@@ -1,4 +1,8 @@
 class PlayersController < ApplicationController
+  def index
+    render json: Player.all
+  end
+
   def show
     @player = Player.find(params[:id])
     @elos = @player.elos.map do |elo|
@@ -10,6 +14,12 @@ class PlayersController < ApplicationController
         }
       end
     end.compact.sort_by { |elo| elo[:elo].frame.created_at }.reverse
+    respond_to do |format|
+      format.html
+      format.json do
+        render json: {player: @player, elos: @elos}.to_json
+      end
+    end
   end
 
   def create
