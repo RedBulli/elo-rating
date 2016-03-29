@@ -1,18 +1,27 @@
 class Frame < ActiveRecord::Base
-  belongs_to :player1_elo, class_name: 'Elo'
-  belongs_to :player2_elo, class_name: 'Elo'
-  belongs_to :winner, class_name: 'Player'
-  validates :player1_elo, :player2_elo, :winner, presence: true
-  after_create :create_new_elos
-  validate :elos_unique
+  has_many :elos
   validates :game_type, inclusion: { in: %w(eight_ball nine_ball one_pocket) }
-  validate :validate_winner_is_either_player
-  validate :validate_different_players
-
   scope :created_this_week, -> { where('frames.created_at >= ?', Time.now.at_beginning_of_week) }
+  has_many :players, through: :elos
   scope :for_player, -> (player) do
     joins(player1_elo: :player, player2_elo: :player)
       .where('players.id = ? OR players_elos.id = ?', player.id, player.id)
+  end
+
+  def self.create_frame(options)
+    Frame.transaction do
+      frame = Frame.create!(game_type: options[:game_type])
+      [options[:winner], options[:loser]].each do |player|
+        player.elo.frame = frame
+        player.elo.breaker = options[:breaker] == player
+        player.elo.winner = options[:winner] == player
+        player.elo.save!
+      end
+      [options[:winner], options[:loser]].each do |player|
+        player.elo.create_next_elo
+      end
+      frame
+    end
   end
 
   def name
@@ -27,16 +36,32 @@ class Frame < ActiveRecord::Base
     player2_elo.player
   end
 
+  def player1_elo
+    elos.find_by(breaker: true)
+  end
+
+  def player2_elo
+    elos.find_by(breaker: false)
+  end
+
+  def winner
+    winner_elo.player
+  end
+
   def loser
-    if player1 == winner
-      player2
-    else
-      player1
-    end
+    loser_elo.player
+  end
+
+  def winner_elo
+    elos.find_by(winner: true)
+  end
+
+  def loser_elo
+    elos.find_by(winner: false)
   end
 
   def next_frame_for_player(player)
-    Frame.for_player(player).where('frames.created_at > ?', created_at).order('frames.created_at ASC').first
+    player.frames.where('frames.created_at > ?', created_at).order('frames.created_at ASC').first
   end
 
   def next_elo_for_player_elo(player_elo)
@@ -62,14 +87,13 @@ class Frame < ActiveRecord::Base
   end
 
   def deletable?
-    ![player1_elo.player, player2_elo.player].any? do |player|
+    !players.any? do |player|
       next_frame_for_player(player)
     end
   end
 
   def recalculate_elos
-    next_elo_for_player_elo(player1_elo).update_attributes!(rating: player1_elo.rating + elo_change(player1_elo))
-    next_elo_for_player_elo(player2_elo).update_attributes!(rating: player2_elo.rating + elo_change(player2_elo))
+    elos.each(&:recalculate_elo_change)
   end
 
   def opponent_elo_of_player(player)
@@ -80,16 +104,16 @@ class Frame < ActiveRecord::Base
     end
   end
 
-  def result(player_elo)
-    if winner == player_elo.player
+  def result(player)
+    if winner == player
       1
     else
       0
     end
   end
 
-  def opponent_elo(player_elo)
-    if player_elo == player1_elo
+  def opponent(player)
+    if player == player1_elo
       player2_elo
     else
       player1_elo
@@ -119,9 +143,5 @@ class Frame < ActiveRecord::Base
     unless frames2 == [] || frames2 == [self]
       errors.add(:player2_elo, 'Player 2 elo is already used in another frame')
     end
-  end
-
-  def elo_change(player_elo)
-    (result(player_elo) - player_elo.ev(opponent_elo(player_elo))) * player_elo.k_factor(opponent_elo(player_elo))
   end
 end

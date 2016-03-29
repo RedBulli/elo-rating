@@ -16,7 +16,7 @@ class HomeController < ApplicationController
 
   def index
     @players = Player.includes(:elo).order('elos.rating DESC').to_a
-    frames = Frame.includes(:player1_elo, :player2_elo).order(created_at: :desc).limit(20).to_a
+    frames = Frame.order(created_at: :desc).limit(20).to_a
     last_frame = frames.first
     @frames = frames.map do |frame|
       {
@@ -30,7 +30,7 @@ class HomeController < ApplicationController
     end
     @game_types = GAME_NAME_MAPPINGS
     @ratings = @players.reduce({established: [], provisional: []}) do |memo, player|
-      if player.provisional?
+      if player.elo.provisional
         memo[:provisional] << player
       else
         memo[:established] << player

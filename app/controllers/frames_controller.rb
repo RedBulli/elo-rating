@@ -1,9 +1,9 @@
 class FramesController < ApplicationController
   def create
-    frame = Frame.create!(
-      player1_elo: player1.elo,
-      player2_elo: player2.elo,
+    frame = Frame::create_frame(
       winner: winner,
+      loser: loser,
+      breaker: player1,
       game_type: permitted_params[:game_type]
     )
     PostResultToFlowdock.perform_async(frame.id)
@@ -24,7 +24,7 @@ class FramesController < ApplicationController
   private
 
   def restore_player_elos(frame)
-    [frame.player1_elo, frame.player2_elo].each do |previous_elo|
+    frame.elos.each do |previous_elo|
       player = previous_elo.player
       changed_elo = player.elo
       player.elo = previous_elo
@@ -54,6 +54,14 @@ class FramesController < ApplicationController
       player1
     else
       player2
+    end
+  end
+
+  def loser
+    if permitted_params[:winner] == 'player1'
+      player2
+    else
+      player1
     end
   end
 end

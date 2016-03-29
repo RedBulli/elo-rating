@@ -1,57 +1,98 @@
 require 'rails_helper'
 
 RSpec.describe Elo, type: :model do
-  let(:player1) { Player.create! name: 'Sampo' }
-  let(:player2) { Player.create! name: 'Oskari' }
-  let(:player3) { Player.create! name: 'Antti' }
+  let(:player1) { create(:player) }
+  let(:player2) { create(:player) }
 
   def create_frame
-    Frame.create! player1_elo: player1.elo, player2_elo: player2.elo, winner: player1, game_type: 'eight_ball'
+    Frame::create_frame(
+      winner: player1,
+      breaker: player1,
+      loser: player2,
+      game_type: 'eight_ball'
+    )
   end
 
-  it 'provisional? should return true when less than and false when more than 15 previous elos' do
+  it 'provisional should return true when less than and false when more than 15 previous elos' do
     14.times { create_frame }
-    expect(player1.elo.provisional?).to eql(true)
+    expect(player1.elo.provisional).to eql(true)
     create_frame
-    expect(player1.elo.provisional?).to eql(false)
+    expect(player1.elo.provisional).to eql(false)
   end
 
-  describe 'K-factor' do
-    it 'is larger when players have provisional elos' do
-      frame = Frame.create!(player1_elo: player1.elo, player2_elo: player2.elo, winner: player2, game_type: 'eight_ball')
-      expect(player1.elo.rating).to eql(1485)
-      expect(player2.elo.rating).to eql(1515)
+  describe '#create_next_elo' do
+    it 'doesn\'t create if elo doesn\'t have a frame' do
+      expect(player1.elo.create_next_elo).to eql(nil)
     end
 
-    it 'uses base when players do not have provisional elos' do
-      15.times { create_frame }
-      player1.elo.rating = 1500
-      player2.elo.rating = 1500
-      frame = Frame.create!(player1_elo: player1.elo, player2_elo: player2.elo, winner: player2, game_type: 'eight_ball')
-      expect(player1.elo.rating).to eql(1495)
-      expect(player2.elo.rating).to eql(1505)
+    it 'player cannot have more than one elo without frame' do
+      frame = create_frame
+      expect {
+        frame.elos.first.create_next_elo
+      }.to raise_error(ActiveRecord::RecordInvalid)
     end
 
-    it 'uses different factors if one has provisional elo' do
-      15.times do
-        create_frame
+    it 'creates a new elo for the player' do
+      frame = create(:frame)
+      [player1, player2].each do |player|
+        player.elo.frame = frame
+        player.elo.breaker = player == player1
+        player.elo.winner = player == player1
+        player.elo.save!
       end
-      player1.elo.rating = 1500
-      expect(player1.elo.k_factor(player3.elo)).to eql(5)
-      expect(player3.elo.k_factor(player1.elo)).to eql(30)
+      elo_before = player1.elo
+      expect{
+        player1.elo.create_next_elo
+      }.to change{Elo.count}.by(1)
+      expect(elo_before).not_to eql(player1.elo)
+      expect(elo_before.rating).to be < player1.elo.rating
+    end
+
+    it 'sets provisional to false if previos elo was not provisional' do
+      player1.elo.update_attributes!(provisional: false)
+      create_frame
+      expect(player1.elo.provisional).to eql(false)
     end
   end
 
-  describe 'ev' do
-    it 'is equal when both players have same rating' do
-      expect(player1.elo.ev(player2.elo)).to eql(0.5)
-      expect(player2.elo.ev(player1.elo)).to eql(0.5)
+  describe '#opponent_elo' do
+    it 'returns the opponent elo' do
+      frame = create_frame
+      expect(frame.elos[0].opponent_elo).to eql(frame.elos[1])
     end
 
-    it '0.7 - 0.3 when 149 points difference' do
-      player1.elo.rating = 1649
-      expect(player1.elo.ev(player2.elo).round(2)).to eql(0.7)
-      expect(player2.elo.ev(player1.elo).round(2)).to eql(0.3)
+    it 'raises if frame has only one player' do
+      frame = create(:frame)
+      player1.elo.frame = frame
+      player1.elo.breaker = true
+      player1.elo.winner = true
+      player1.elo.save!
+      expect{
+        player1.elo.opponent_elo
+      }.to raise_error
+    end
+  end
+
+  describe 'validation with frame' do
+    it 'only one elo can be winner' do
+      frame = create_frame
+      loser_elo = frame.loser_elo
+      loser_elo.winner = true
+      expect(loser_elo.validate).to eql(false)
+    end
+
+    it 'only one elo can be breaker' do
+      frame = create_frame
+      player2_elo = frame.player2_elo
+      player2_elo.breaker = true
+      expect(player2_elo.validate).to eql(false)
+    end
+
+    it 'elos cannot belong to the same player' do
+      frame = create_frame
+      player2_elo = frame.player2_elo
+      player2_elo.player = frame.player1
+      expect(player2_elo.validate).to eql(false)
     end
   end
 end

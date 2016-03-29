@@ -1,47 +1,79 @@
+require 'elo_calculator'
+
 class Elo < ActiveRecord::Base
   belongs_to :player
-  validates :player, presence: true
-  scope :with_frames, -> { joins('LEFT OUTER JOIN frames ON (frames.player1_elo_id = elos.id OR frames.player2_elo_id = elos.id)') }
-  scope :for_player_id, -> (player_id) { where('elos.player_id = ?', player_id) }
+  belongs_to :frame, optional: true
+  validates :rating, presence: true
+  validates :player, uniqueness: {scope: :frame}
+  validates :provisional, inclusion: { in: [true, false] }
 
-  BASE_K_FACTOR = 10
+  with_options if: :frame do |elo|
+    elo.validates :winner, uniqueness: {scope: :frame}
+    elo.validates :breaker, uniqueness: {scope: :frame}
+  end
+
+  def create_next_elo
+    if frame
+      player.elo = Elo.create!(
+        player: player,
+        rating: rating + calculator.elo_change(winner ? 1 : 0),
+        provisional: provisional == false ? false : past_elos_count < 14
+      )
+      player.save!
+      player.elo
+    end
+  end
+
+  def opponent_elo
+    frame_elos = frame.elos.to_a
+    if frame_elos.length != 2
+      raise 'Frame has to have 2 elos'
+    else
+      frame_elos.find { |elo| elo != self }
+    end
+  end
 
   def name
     "#{player.name} (#{rating.to_i})"
   end
 
-  def provisional?
-    past_elos_count < 15
-  end
-
-  def frame
-    Frame.where('player1_elo_id = ? OR player2_elo_id = ?', id, id).first
-  end
-
   def past_elos_count
     if frame
       Elo
-        .with_frames
-        .for_player_id(player_id)
-        .where('frames.created_at < ?', frame.created_at)
+        .joins(:frame)
+        .where('elos.player_id = ? AND frames.created_at < ?', player.id, frame.created_at)
         .count
     else
       player.elos.count - 1
     end
   end
 
-  def k_factor(opponent_elo)
-    if provisional?
-      BASE_K_FACTOR * 3
-    elsif opponent_elo.provisional?
-      BASE_K_FACTOR / 2
-    else
-      BASE_K_FACTOR
-    end
+  def next_elo
+    next_frame_elo || player.elo
   end
 
-  def ev(opponent_elo)
-    rating_diff = (opponent_elo.rating-rating).to_d
-    (1.0/(1.0+10.0**(rating_diff/400.0))).to_d
+  def next_frame_elo
+    Elo
+      .joins(:frame)
+      .where('elos.player_id = ? AND frames.created_at > ?', player.id, frame.created_at)
+      .order('frames.created_at ASC')
+      .first
+  end
+
+  def recalculate_elo_change
+    elo = next_elo
+    elo.rating = rating + calculator.elo_change(winner ? 1 : 0)
+    elo.save
+  end
+
+  def calculator
+    EloCalculator.new(self.to_calculator_hash, opponent_elo.to_calculator_hash)
+  end
+
+  def to_calculator_hash
+    {
+      rating: rating,
+      provisional: provisional
+    }
   end
 end

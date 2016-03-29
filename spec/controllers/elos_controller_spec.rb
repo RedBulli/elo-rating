@@ -12,10 +12,10 @@ RSpec.describe ElosController, type: :controller do
 
   describe '#ev' do
     it 'returns the ev for the players' do
-      Frame.create(
-        player1_elo: player_sampo.elo,
-        player2_elo: player_oskari.elo,
+      Frame::create_frame(
         winner: player_sampo,
+        breaker: player_sampo,
+        loser: player_oskari,
         game_type: 'eight_ball'
       )
       player_sampo.elo.rating = 1500

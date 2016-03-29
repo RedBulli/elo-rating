@@ -1,17 +1,17 @@
+require 'elo_calculator'
+
 class ElosController < ApplicationController
   def ev
-    player1_ev = player1.elo.ev(player2.elo)
-    player2_ev = 1.0 - player1_ev
     render json: {
       player1: {
-        ev: player1_ev.to_f,
-        elo_change_win: ((1-player1_ev) * player1.elo.k_factor(player2.elo)).to_f,
-        elo_change_lose: (-player1_ev * player1.elo.k_factor(player2.elo)).to_f
+        ev: elo_calculators[0].ev.to_f,
+        elo_change_win: elo_calculators[0].elo_change(1).to_f,
+        elo_change_lose: elo_calculators[0].elo_change(0).to_f
       },
       player2: {
-        ev: player2_ev.to_f,
-        elo_change_win: ((1-player2_ev) * player2.elo.k_factor(player1.elo)).to_f,
-        elo_change_lose: (-player2_ev * player2.elo.k_factor(player1.elo)).to_f
+        ev: elo_calculators[1].ev.to_f,
+        elo_change_win: elo_calculators[1].elo_change(1).to_f,
+        elo_change_lose: elo_calculators[1].elo_change(0).to_f
       },
       should_change_breaker: should_change_breaker?
     }
@@ -19,19 +19,31 @@ class ElosController < ApplicationController
 
   private
 
-  def player1
-    Player.find(params[:player1])
+  def elo_calculators
+    [
+      EloCalculator.new(elos[0].to_calculator_hash, elos[1].to_calculator_hash),
+      EloCalculator.new(elos[1].to_calculator_hash, elos[0].to_calculator_hash)
+    ]
   end
 
-  def player2
-    Player.find(params[:player2])
+  def elos
+    @elos ||= players.map(&:elo)
+  end
+
+  def players
+    @players ||= [Player.find(params[:player1]), Player.find(params[:player2])]
   end
 
   def should_change_breaker?
-    !!(last_frame_against && last_frame_against.player1_elo.player == player1)
+    frame = last_frame_against
+    if frame
+      players[0].elos.find_by(frame: frame).breaker
+    else
+      false
+    end
   end
 
   def last_frame_against
-    player1.frames_against_with(player2).order(created_at: :desc).first
+    players[0].frames_against_with(players[1]).order(created_at: :desc).first
   end
 end

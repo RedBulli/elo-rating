@@ -42,17 +42,29 @@ RSpec.describe FramesController, type: :controller do
 
   describe '#destroy' do
     it 'redirects to index' do
-      p1 = Player.create!(name: 'Sampo')
-      frame = Frame.create!(player1_elo: p1.elo, player2_elo: Player.create!(name: 'Oskari').elo, winner: p1, game_type: 'nine_ball')
+      frame = Frame::create_frame(
+        winner: player_sampo,
+        loser: player_oskari,
+        breaker: player_sampo,
+        game_type: 'nine_ball'
+      )
       process :destroy, method: :delete, params: { id: frame.id }
       expect(response).to redirect_to('/')
     end
 
     it 'does not allow undeletable frames to be deleted' do
-      p1 = Player.create!(name: 'Sampo')
-      p2 = Player.create!(name: 'Oskari')
-      first_frame = Frame.create!(player1_elo: p1.elo, player2_elo: p2.elo, winner: p1, game_type: 'nine_ball')
-      Frame.create!(player1_elo: p1.elo, player2_elo: p2.elo, winner: p2, game_type: 'one_pocket')
+      first_frame = Frame::create_frame(
+        winner: player_sampo,
+        loser: player_oskari,
+        breaker: player_sampo,
+        game_type: 'nine_ball'
+      )
+      Frame::create_frame(
+        winner: player_sampo,
+        loser: player_oskari,
+        breaker: player_sampo,
+        game_type: 'nine_ball'
+      )
       expect{
         process :destroy, method: :delete, params: { id: first_frame.id }
       }.to change{Frame.count}.by(0)
