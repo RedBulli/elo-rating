@@ -24,10 +24,20 @@ class Elo < ActiveRecord::Base
     end
   end
 
+  def remove_frame
+    newest_elo = player.elo
+    player.update_attributes!(elo_id: id)
+    newest_elo.destroy!
+    self.frame = nil
+    self.winner = nil
+    self.breaker = nil
+    save!
+  end
+
   def opponent_elo
     frame_elos = frame.elos.to_a
     if frame_elos.length != 2
-      raise 'Frame has to have 2 elos'
+      fail 'Frame has to have 2 elos'
     else
       frame_elos.find { |elo| elo != self }
     end
@@ -67,7 +77,7 @@ class Elo < ActiveRecord::Base
   end
 
   def calculator
-    EloCalculator.new(self.to_calculator_hash, opponent_elo.to_calculator_hash)
+    EloCalculator.new(to_calculator_hash, opponent_elo.to_calculator_hash)
   end
 
   def to_calculator_hash

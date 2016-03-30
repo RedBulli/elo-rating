@@ -13,7 +13,7 @@ class FramesController < ApplicationController
   def destroy
     frame = Frame.find(params[:id])
     if frame.deletable?
-      restore_player_elos(frame)
+      frame.elos.each(&:remove_frame)
       frame.destroy!
       redirect_to root_url
     else
@@ -22,16 +22,6 @@ class FramesController < ApplicationController
   end
 
   private
-
-  def restore_player_elos(frame)
-    frame.elos.each do |previous_elo|
-      player = previous_elo.player
-      changed_elo = player.elo
-      player.elo = previous_elo
-      changed_elo.destroy!
-      player.save!
-    end
-  end
 
   def permitted_params
     params.require(:player1)

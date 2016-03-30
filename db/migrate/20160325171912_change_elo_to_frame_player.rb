@@ -39,8 +39,10 @@ class ChangeEloToFramePlayer < ActiveRecord::Migration[5.0]
         elo.winner = frame.winner_id == elo.player_id
         elo.breaker = frame.player1_elo == elo
         elo.provisional = provisional?(elo, frame)
-        elo.save
+      else
+        elo.provisional = provisional?(elo, nil)
       end
+      elo.save
     end
   end
 
@@ -52,7 +54,7 @@ class ChangeEloToFramePlayer < ActiveRecord::Migration[5.0]
           .where('elos.player_id = ? AND frames.created_at < ?', elo.player_id, frame.created_at)
           .count
       else
-        Elo.where('player_id = ?', elo.player.id).count - 1
+        Elo.where('player_id = ?', elo.player_id).count - 1
       end
     frame_count < 15
   end

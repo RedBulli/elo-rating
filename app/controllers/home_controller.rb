@@ -16,7 +16,7 @@ class HomeController < ApplicationController
 
   def index
     @players = Player.includes(:elo).order('elos.rating DESC').to_a
-    frames = Frame.order(created_at: :desc).limit(20).to_a
+    frames = Frame.eager_load(:elos).eager_load(:players).order(created_at: :desc).limit(20).to_a
     last_frame = frames.first
     @frames = frames.map do |frame|
       {

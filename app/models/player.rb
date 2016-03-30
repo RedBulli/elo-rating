@@ -4,7 +4,7 @@ class Player < ActiveRecord::Base
   has_many :elos
   has_many :frames, through: :elos
 
-  def initialize(attributes={})
+  def initialize(attributes = {})
     super
     self.elo = Elo.new(player: self, rating: 1500, provisional: true)
   end
@@ -15,12 +15,14 @@ class Player < ActiveRecord::Base
 
   def merge_player(player)
     if frames_against_with(player).length > 0
-      raise 'Merging players who have played against each other is not allowed'
+      fail 'Merging players who have played against each other is not allowed'
     end
     ActiveRecord::Base.transaction do
-      player.elo.destroy
-      Elo.where(player: player).update_all(player_id: self.id)
-      Player.destroy(player.id)
+      Elo.where(player: player).update_all(player_id: id)
+      newest_elo = player.elo
+      player.update_attribute('elo_id', nil)
+      newest_elo.destroy!
+      player.destroy!
     end
   end
 

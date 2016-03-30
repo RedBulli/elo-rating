@@ -11,24 +11,25 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160326201623) do
+ActiveRecord::Schema.define(version: 20160330045555) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "elos", force: :cascade do |t|
-    t.integer "player_id"
-    t.decimal "rating",      precision: 6, scale: 2
+    t.integer "player_id",                           null: false
+    t.decimal "rating",      precision: 6, scale: 2, null: false
     t.integer "frame_id"
     t.boolean "winner"
     t.boolean "breaker"
-    t.boolean "provisional"
+    t.boolean "provisional",                         null: false
   end
 
   create_table "frames", force: :cascade do |t|
     t.datetime "created_at",                        null: false
     t.datetime "updated_at",                        null: false
     t.string   "game_type",  default: "eight_ball", null: false
+    t.index ["created_at"], name: "index_frames_on_created_at", using: :btree
   end
 
   create_table "players", force: :cascade do |t|
@@ -38,4 +39,7 @@ ActiveRecord::Schema.define(version: 20160326201623) do
     t.datetime "updated_at", null: false
   end
 
+  add_foreign_key "elos", "frames"
+  add_foreign_key "elos", "players"
+  add_foreign_key "players", "elos"
 end
