@@ -14,9 +14,9 @@ RSpec.describe PlayersController, type: :controller do
     end
 
     it 'creates frame' do
-      expect {
+      expect do
         process :create, method: :post, params: { name: 'Sampo' }
-      }.to change{Player.count}.from(0).to(1)
+      end.to change { Player.count }.from(0).to(1)
     end
   end
 
@@ -30,10 +30,16 @@ RSpec.describe PlayersController, type: :controller do
 
   describe '#show' do
     it 'returns the player and its elos with json' do
-      player = Player.create!(name: 'Sampo')
+      player = create(:player)
+      Frame::create_frame(
+        winner: player,
+        loser: create(:player),
+        breaker: player,
+        game_type: 'nine_ball'
+      )
       process :show, method: :get, params: { id: player.id }, format: :json
       response_json = JSON.parse(response.body)
-      expect(response_json['player']).to include({'id' => player.id, 'name' => player.name})
+      expect(response_json['player']).to include('id' => player.id, 'name' => player.name)
     end
   end
 end
