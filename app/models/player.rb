@@ -42,7 +42,7 @@ class Player < ActiveRecord::Base
   end
 
   def frames_count
-    elos.count - 1
+    elos.size - 1
   end
 
   def win_count

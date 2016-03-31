@@ -1,7 +1,7 @@
 require 'elo_calculator'
 
 class Elo < ActiveRecord::Base
-  belongs_to :player
+  belongs_to :player, counter_cache: true
   belongs_to :frame, optional: true
   validates :rating, presence: true
   validates :player, uniqueness: {scope: :frame}
