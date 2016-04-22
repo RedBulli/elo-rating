@@ -1,6 +1,6 @@
 class PlayersController < ApplicationController
   def index
-    render json: Player.all
+    render json: Player.includes(:elo).all
   end
 
   def show
