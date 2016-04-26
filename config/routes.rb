@@ -6,6 +6,7 @@ Rails.application.routes.draw do
   resources :frames, only: [:create, :destroy]
   resources :players, only: [:show, :create, :index]
 
+  get '/frames/count', to: 'frames#count'
   get '/ev', to: 'elos#ev'
 
   require 'sidekiq/web'

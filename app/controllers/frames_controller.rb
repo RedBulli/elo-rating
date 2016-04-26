@@ -21,6 +21,10 @@ class FramesController < ApplicationController
     end
   end
 
+  def count
+    render body: Frame.count
+  end
+
   private
 
   def permitted_params
