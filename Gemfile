@@ -30,7 +30,8 @@ gem 'sinatra', github: 'sinatra/sinatra', require: false
 
 gem 'skylight'
 gem 'newrelic_rpm', '~> 3.15', '>= 3.15.0.314'
-gem 'active_model_serializers'
+gem 'active_model_serializers', '0.10.0.rc5'
+
 gem 'rack-cors', require: 'rack/cors'
 
 # Use ActiveModel has_secure_password

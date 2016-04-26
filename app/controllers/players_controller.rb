@@ -4,12 +4,18 @@ class PlayersController < ApplicationController
   end
 
   def show
-    @player = Player.find(params[:id])
-    @elos = elos
+    @player = Player.includes(:elo).find(params[:id])
     respond_to do |format|
-      format.html
+      format.html do
+        @elos = elos
+      end
       format.json do
-        render json: { player: @player, elos: @elos }.to_json
+        render json: {
+          player: PlayerSerializer.new(@player).as_json,
+          elos: @player.elos.map do |elo|
+            EloSerializer.new(elo).as_json
+          end
+        }
       end
     end
   end
