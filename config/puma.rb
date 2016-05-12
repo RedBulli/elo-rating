@@ -9,5 +9,5 @@ port ENV.fetch('PORT', 3000)
 environment ENV.fetch('RACK_ENV', 'development')
 
 on_worker_boot do
-  ActiveRecord::Base.establish_connection
+  ActiveRecord::Base.establish_connection if defined?(ActiveRecord)
 end
