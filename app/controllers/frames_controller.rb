@@ -21,6 +21,13 @@ class FramesController < ApplicationController
     end
   end
 
+  def index
+    frames = Frame.where(nil).includes(:elos)
+    frames = frames.for_player(params[:player]) if params[:player]
+    frames = frames.limit(params[:limit]) if params[:limit]
+    render json: frames.order('created_at DESC')
+  end
+
   def count
     render body: Frame.count
   end

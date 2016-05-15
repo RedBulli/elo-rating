@@ -27,19 +27,4 @@ RSpec.describe PlayersController, type: :controller do
       expect(JSON.parse(response.body).length).to eql(1)
     end
   end
-
-  describe '#show' do
-    it 'returns the player and its elos with json' do
-      player = create(:player)
-      Frame::create_frame(
-        winner: player,
-        loser: create(:player),
-        breaker: player,
-        game_type: 'nine_ball'
-      )
-      process :show, method: :get, params: { id: player.id }, format: :json
-      response_json = JSON.parse(response.body)
-      expect(response_json['player']).to include('id' => player.id, 'name' => player.name)
-    end
-  end
 end

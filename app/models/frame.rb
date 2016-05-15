@@ -3,10 +3,7 @@ class Frame < ActiveRecord::Base
   validates :game_type, inclusion: { in: %w(eight_ball nine_ball one_pocket) }
   scope :created_this_week, -> { where('frames.created_at >= ?', Time.now.at_beginning_of_week) }
   has_many :players, through: :elos
-  scope :for_player, -> (player) do
-    joins(player1_elo: :player, player2_elo: :player)
-      .where('players.id = ? OR players_elos.id = ?', player.id, player.id)
-  end
+  scope :for_player, -> (player_id) { joins(:players).where(players: {id: player_id}) }
 
   def self.create_frame(options)
     Frame.transaction do
@@ -94,6 +91,14 @@ class Frame < ActiveRecord::Base
 
   def recalculate_elos
     elos.each(&:recalculate_elo_change)
+  end
+
+  def elo_of_player(player)
+    if player1_elo.player == player
+      player1_elo
+    else
+      player2_elo
+    end
   end
 
   def opponent_elo_of_player(player)
