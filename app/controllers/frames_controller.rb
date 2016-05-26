@@ -7,7 +7,10 @@ class FramesController < ApplicationController
       game_type: permitted_params[:game_type]
     )
     PostResultToFlowdock.perform_async(frame.id)
-    redirect_to root_url
+    respond_to do |format|
+      format.html { redirect_to root_url }
+      format.json { render json: frame }
+    end
   end
 
   def destroy
@@ -15,9 +18,12 @@ class FramesController < ApplicationController
     if frame.deletable?
       frame.elos.each(&:remove_frame)
       frame.destroy!
-      redirect_to root_url
+      respond_to do |format|
+        format.html { redirect_to root_url }
+        format.json { render body: nil, status: 204 }
+      end
     else
-      render body: nil, status: 400
+      render json: { error: 'Cannot delete frame' }.to_json, status: 400
     end
   end
 
