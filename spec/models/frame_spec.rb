@@ -41,7 +41,7 @@ RSpec.describe Frame, type: :model do
           loser: player1,
           game_type: 'eight_ball'
         )
-      }.to raise_error
+      }.to raise_error(ActiveRecord::RecordInvalid)
     end
 
     describe 'game_type' do

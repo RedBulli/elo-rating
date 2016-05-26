@@ -69,7 +69,7 @@ RSpec.describe Elo, type: :model do
       player1.elo.save!
       expect{
         player1.elo.opponent_elo
-      }.to raise_error
+      }.to raise_error(RuntimeError)
     end
   end
 

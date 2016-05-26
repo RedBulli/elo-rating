@@ -44,6 +44,8 @@ gem 'rack-cors', require: 'rack/cors'
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'
+  gem 'rspec-rails', '~> 3.5.0.beta1'
+  gem 'rspec_junit_formatter'
 end
 
 group :development do
@@ -51,6 +53,10 @@ group :development do
   gem 'web-console', '~> 3.0'
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
+  gem 'spring-commands-rspec'
+  gem 'rspec', '~> 3.5.0.beta1'
+  gem 'rubocop'
+  gem 'guard-rubocop'
 end
 
 group :test do
@@ -58,7 +64,6 @@ group :test do
   gem 'terminal-notifier-guard'
   gem 'rspec-sidekiq'
   gem 'webmock'
-  gem 'rspec-rails'
   gem 'factory_girl_rails'
 end
 
