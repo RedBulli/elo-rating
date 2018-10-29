@@ -65,6 +65,7 @@ group :test do
   gem 'rspec-sidekiq'
   gem 'webmock'
   gem 'factory_girl_rails'
+  gem 'simplecov', require: false
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem

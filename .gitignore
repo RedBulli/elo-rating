@@ -25,3 +25,4 @@ log
 vendor
 .env
 public/assets
+coverage
